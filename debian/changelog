@@ -1,0 +1,76 @@
+xserver-xorg-input-evdev (1:1.1.2-2) UNRELEASED; urgency=low
+
+  * Test for obj-$(DEB_BUILD_GNU_TYPE) before creating it during build;
+    idempotency fix. 
+
+ -- Andres Salomon <dilinger@debian.org>  Mon, 17 Jul 2006 00:36:42 -0400
+
+xserver-xorg-input-evdev (1:1.1.2-1) unstable; urgency=low
+
+  * New upstream release
+    + Now includes manpage (closes: #362679)
+    + Doesn't suck (closes: #365581)
+  * Run dh_install with --list-missing
+  * Bump debhelper compat to 5
+  * Bump standards version to 3.7.2.0
+  * Add x11proto-kb-dev to build-depends
+
+ -- David Nusinow <dnusinow@debian.org>  Tue, 30 May 2006 22:37:01 -0400
+
+xserver-xorg-input-evdev (1:1.0.0.5-2) unstable; urgency=low
+
+  * Upload to modular
+
+ -- David Nusinow <dnusinow@debian.org>  Sun, 26 Mar 2006 20:25:00 -0500
+
+xserver-xorg-input-evdev (1:1.0.0.5-1) experimental; urgency=low
+
+  * First upload to Debian
+  * Change source package, package, and provides names to denote the
+    type of driver and that they are for xserver-xorg
+
+ -- David Nusinow <dnusinow@debian.org>  Thu, 19 Jan 2006 20:40:34 -0500
+
+xserver-xorg-input-evdev (1:1.0.0.5-0ubuntu1) dapper; urgency=low
+
+  * New upstream release.
+  * Add provides on xserver-xorg-input.
+
+ -- Daniel Stone <daniel.stone@ubuntu.com>  Wed,  4 Jan 2006 19:42:22 +1100
+
+xserver-xorg-input-evdev (1:1.0.0.4-0ubuntu1) dapper; urgency=low
+
+  * New upstream release.
+
+ -- Daniel Stone <daniel.stone@ubuntu.com>  Mon, 19 Dec 2005 08:55:27 +1100
+
+xserver-xorg-input-evdev (1:1.0.0.3-0ubuntu1) dapper; urgency=low
+
+  * New upstream release.
+
+ -- Daniel Stone <daniel.stone@ubuntu.com>  Mon, 12 Dec 2005 13:37:47 +1100
+
+xserver-xorg-input-evdev (1:1.0.0.2-0ubuntu2) dapper; urgency=low
+
+  * Add missing Build-Depends (x11proto-core-dev, x11proto-randr-dev,
+    x11proto-input-dev).
+
+ -- Daniel Stone <daniel.stone@ubuntu.com>  Mon,  5 Dec 2005 12:47:45 +1100
+
+xserver-xorg-input-evdev (1:1.0.0.2-0ubuntu1) dapper; urgency=low
+
+  * New upstream release.
+
+ -- Daniel Stone <daniel.stone@ubuntu.com>  Tue, 22 Nov 2005 13:20:15 +1100
+
+xserver-xorg-input-evdev (1:1.0.0.1-1) dapper; urgency=low
+
+  * New upstream release.
+
+ -- Daniel Stone <daniel.stone@ubuntu.com>  Tue, 25 Oct 2005 16:52:45 +1000
+
+xserver-xorg-input-evdev (1:1.0.0-1) breezy; urgency=low
+
+  * First xserver-xorg-input-evdev release.
+
+ -- Daniel Stone <daniel.stone@ubuntu.com>  Wed,  6 Jul 2005 15:48:17 +1000

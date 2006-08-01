@@ -1,0 +1,28 @@
+Source: xserver-xorg-input-evdev
+Section: x11
+Priority: optional
+Maintainer: Debian X Strike Force <debian-x@lists.debian.org>
+Uploaders: David Nusinow <dnusinow@debian.org>, Branden Robinson <branden@debian.org>, Fabio M. Di Nitto <fabbione@fabbione.net>
+Build-Depends: debhelper (>= 5.0.0), pkg-config, xserver-xorg-dev, linux-kernel-headers, x11proto-core-dev, x11proto-randr-dev, x11proto-input-dev, x11proto-kb-dev
+Standards-Version: 3.7.2
+
+Package: xserver-xorg-input-evdev
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, xserver-xorg-core (>= 1:0.99.0-1)
+Provides: xserver-xorg-input
+Replaces: xserver-xorg (<< 6.8.2-35)
+Description: X.Org X server -- evdev input driver
+ This package provides the driver for input devices using evdev, the Linux
+ kernel's event delivery mechanism.  This driver allows for multiple keyboards
+ and mice to be treated as separate input devices, and matched on physical
+ attributes such as which USB port they're connected to.
+ .
+ Note that this driver is different from Protocol "evdev" in the keyboard and
+ mouse drivers, as shipped with Ubuntu 4.10 and 5.04, and Debian 3.1.
+ .
+ More information about X.Org can be found at:
+ <URL:http://xorg.freedesktop.org>
+ <URL:http://lists.freedesktop.org/mailman/listinfo/xorg>
+ .
+ This module can be found as the module 'driver/xf86-input-evdev' at
+ :pserver:anoncvs@cvs.freedesktop.org:/cvs/xorg

@@ -1,3 +1,9 @@
+xserver-xorg-input-evdev (1:2.0.3-2ubuntu1) intrepid; urgency=low
+
+  * Pull 36d702006d, "Force rules, not model, to be evdev".
+
+ -- Timo Aaltonen <tepsipakki@ubuntu.com>  Tue, 09 Sep 2008 18:35:28 +0300
+
 xserver-xorg-input-evdev (1:2.0.3-2) experimental; urgency=low
 
   * Build against xserver 1.5 rc6.

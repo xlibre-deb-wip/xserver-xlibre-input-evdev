@@ -1,8 +1,9 @@
 xserver-xorg-input-evdev (1:2.0.3-2ubuntu1) intrepid; urgency=low
 
   * Pull 36d702006d, "Force rules, not model, to be evdev".
+  * Change the maintainer address.
 
- -- Timo Aaltonen <tepsipakki@ubuntu.com>  Tue, 09 Sep 2008 18:35:28 +0300
+ -- Timo Aaltonen <tepsipakki@ubuntu.com>  Tue, 09 Sep 2008 18:36:57 +0300
 
 xserver-xorg-input-evdev (1:2.0.3-2) experimental; urgency=low
 

@@ -1,4 +1,4 @@
-xserver-xorg-input-evdev (1:2.0.99+git20080912-0ubuntu1) UNRELEASED; urgency=low
+xserver-xorg-input-evdev (1:2.0.99+git20080912-0ubuntu1) intrepid; urgency=low
 
   * New upstream snapshot, up to commit 9930477cbeb4acf.
     - Add support for device properties (Middle button emulation, timeout).
@@ -11,7 +11,7 @@ xserver-xorg-input-evdev (1:2.0.99+git20080912-0ubuntu1) UNRELEASED; urgency=low
   * 100_dont_check_abi.patch: Don't check for XINPUT_VERSION >= 3, since
     our xserver & libXi has those bits backported.
 
- -- Timo Aaltonen <tepsipakki@ubuntu.com>  Fri, 12 Sep 2008 16:05:28 +0300
+ -- Timo Aaltonen <tepsipakki@ubuntu.com>  Fri, 12 Sep 2008 16:15:21 +0300
 
 xserver-xorg-input-evdev (1:2.0.4-1) UNRELEASED; urgency=low
 

@@ -60,7 +60,7 @@ clean: xsfclean
 	rm -rf obj-*
 	rm -f $$(find -name Makefile.in)
 	rm -f compile config.guess config.sub configure depcomp install-sh
-	rm -f ltmain.sh missing INSTALL aclocal.m4 ylwrap mkinstalldirs
+	rm -f ltmain.sh missing INSTALL aclocal.m4 ylwrap mkinstalldirs config.h.in
 
 	dh_clean
 

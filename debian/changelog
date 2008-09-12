@@ -1,3 +1,10 @@
+xserver-xorg-input-evdev (1:2.0.4-1) UNRELEASED; urgency=low
+
+  * New upstream release.
+  * rules: Clean config.h.in.
+
+ -- Timo Aaltonen <tepsipakki@ubuntu.com>  Fri, 12 Sep 2008 14:52:54 +0300
+
 xserver-xorg-input-evdev (1:2.0.3-2ubuntu1) intrepid; urgency=low
 
   * Pull 36d702006d, "Force rules, not model, to be evdev".

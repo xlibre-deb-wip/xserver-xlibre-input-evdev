@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: Ubuntu Core Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 XSBC-Original-Maintainer: Debian X Strike Force <debian-x@lists.debian.org>
 Uploaders: David Nusinow <dnusinow@debian.org>, Drew Parsons <dparsons@debian.org>, Julien Cristau <jcristau@debian.org>
-Build-Depends: debhelper (>= 5.0.0), pkg-config, quilt, xserver-xorg-dev (>= 2:1.4.99.906), x11proto-core-dev, x11proto-randr-dev, x11proto-input-dev, x11proto-kb-dev, libxkbfile-dev, dpkg-dev (>= 1.14.17), automake, libtool, xutils-dev
+Build-Depends: debhelper (>= 5.0.0), pkg-config, quilt, xserver-xorg-dev (>= 2:1.5.1-1ubuntu3), x11proto-core-dev, x11proto-randr-dev, x11proto-input-dev (1.4.3-2ubuntu3), x11proto-kb-dev, libxkbfile-dev, dpkg-dev (>= 1.14.17), automake, libtool, xutils-dev
 Standards-Version: 3.7.3
 Vcs-Git: git://git.debian.org/git/pkg-xorg/driver/xserver-xorg-input-evdev
 Vcs-Browser: http://git.debian.org/?p=pkg-xorg/driver/xserver-xorg-input-evdev.git

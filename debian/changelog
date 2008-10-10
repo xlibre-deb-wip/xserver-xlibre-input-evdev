@@ -1,10 +1,10 @@
-xserver-xorg-input-evdev (1:2.0.99+git20080912-0ubuntu3) UNRELEASED; urgency=low
+xserver-xorg-input-evdev (1:2.0.99+git20080912-0ubuntu3) intrepid; urgency=low
 
   * Merged with upstream master, commit 84a0e39c0dd, "Use new property API"
   * Drop patch 101, cherry-picked the commit.
   * Bump the build-dep on xserver-xorg-dev and x11proto-input-dev.
 
- -- Timo Aaltonen <tepsipakki@ubuntu.com>  Wed, 08 Oct 2008 11:58:14 +0300
+ -- Timo Aaltonen <tepsipakki@ubuntu.com>  Fri, 10 Oct 2008 12:24:00 +0300
 
 xserver-xorg-input-evdev (1:2.0.99+git20080912-0ubuntu2) intrepid; urgency=low
 

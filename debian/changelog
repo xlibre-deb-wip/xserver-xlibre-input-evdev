@@ -1,3 +1,10 @@
+xserver-xorg-input-evdev (1:2.0.99+git20080912-0ubuntu4) intrepid; urgency=low
+
+  * Cherry-pick commit 7243116f from upstream, "Don't post keycodes > 255."
+    (LP: #274203)
+
+ -- Timo Aaltonen <tepsipakki@ubuntu.com>  Thu, 16 Oct 2008 17:37:04 +0300
+
 xserver-xorg-input-evdev (1:2.0.99+git20080912-0ubuntu3) intrepid; urgency=low
 
   * Merged with upstream master, commit 84a0e39c0dd, "Use new property API"

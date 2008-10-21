@@ -1,2 +1,3 @@
 include-the-proper-header-for-XkbSetRulesDflts-and-X.patch
 100_dont_check_abi.patch
+101_64bit_safe_testbit.patch

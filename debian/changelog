@@ -1,4 +1,4 @@
-xserver-xorg-input-evdev (1:2.0.99+git20080912-0ubuntu6) intrepid; urgency=low
+xserver-xorg-input-evdev (1:2.0.99+git20080912-0ubuntu6) intrepid-proposed; urgency=low
 
   * 101_64bit_safe_testbit.patch: On amd64 evdev would be used for joysticks
     because TestBit would return a wrong value. (LP: #284951)

@@ -1,3 +1,13 @@
+xserver-xorg-input-evdev (1:2.1.0-0ubuntu1) UNRELEASED; urgency=low
+
+  * Merge from Debian experimental, remaining changes:
+    - 100_dont_check_abi.patch: Don't check for XINPUT_VERSION >= 3, since
+      our xserver & libXi has those bits backported.
+    - Bump the build-dep on xserver-xorg-dev and x11proto-input-dev.
+  * Don't install the fdi file, hal in ubuntu already ships one.
+
+ -- Timo Aaltonen <tepsipakki@ubuntu.com>  Wed, 26 Nov 2008 13:29:09 +0200
+
 xserver-xorg-input-evdev (1:2.1.0-1) UNRELEASED; urgency=low
 
   * New upstream release.

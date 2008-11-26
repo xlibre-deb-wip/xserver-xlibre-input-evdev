@@ -1,7 +1,7 @@
 Source: xserver-xorg-input-evdev
 Section: x11
 Priority: optional
-Maintainer: Ubuntu Core Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Maintainer: Ubuntu X-SWAT <ubuntu-x@lists.ubuntu.com>
 XSBC-Original-Maintainer: Debian X Strike Force <debian-x@lists.debian.org>
 Uploaders: David Nusinow <dnusinow@debian.org>, Drew Parsons <dparsons@debian.org>, Julien Cristau <jcristau@debian.org>
 Build-Depends: debhelper (>= 5.0.0), pkg-config, quilt, xserver-xorg-dev (>= 2:1.5.1-1ubuntu3), x11proto-core-dev, x11proto-randr-dev, x11proto-input-dev (>= 1.4.3-2ubuntu3), x11proto-kb-dev, libxkbfile-dev, dpkg-dev (>= 1.14.17), automake, libtool, xutils-dev

@@ -1,3 +1,27 @@
+xserver-xorg-input-evdev (1:2.1.0-1) UNRELEASED; urgency=low
+
+  * New upstream release.
+
+ -- Timo Aaltonen <tepsipakki@ubuntu.com>  Wed, 19 Nov 2008 15:34:39 +0200
+
+xserver-xorg-input-evdev (1:2.0.99.3-1) experimental; urgency=low
+
+  [ Timo Aaltonen ]
+  * rules: Clean config.h.in.
+
+  [ Julien Cristau ]
+  * New upstream release.
+    + don't grab the device by default
+    + close the device on DEVICE_OFF, and reopen it on DEVICE_ON
+      (closes: #496101, #492146)
+  * Drop patch included upstream.
+  * Install (temporarily) an fdi file to get Xorg to load the evdev driver for
+    mice and keyboards.
+  * Depend on xserver-xorg-core >= 2:1.5.3, to make sure the console is set to
+    RAW mode.
+
+ -- Julien Cristau <jcristau@debian.org>  Wed, 12 Nov 2008 20:22:57 +0100
+
 xserver-xorg-input-evdev (1:2.0.99+git20080912-0ubuntu6) intrepid-proposed; urgency=low
 
   * 101_64bit_safe_testbit.patch: On amd64 evdev would be used for joysticks
@@ -48,13 +72,6 @@ xserver-xorg-input-evdev (1:2.0.99+git20080912-0ubuntu1) intrepid; urgency=low
     our xserver & libXi has those bits backported.
 
  -- Timo Aaltonen <tepsipakki@ubuntu.com>  Fri, 12 Sep 2008 16:15:21 +0300
-
-xserver-xorg-input-evdev (1:2.0.4-1) UNRELEASED; urgency=low
-
-  * New upstream release.
-  * rules: Clean config.h.in.
-
- -- Timo Aaltonen <tepsipakki@ubuntu.com>  Fri, 12 Sep 2008 14:52:54 +0300
 
 xserver-xorg-input-evdev (1:2.0.3-2ubuntu1) intrepid; urgency=low
 

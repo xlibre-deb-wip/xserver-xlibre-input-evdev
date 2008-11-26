@@ -41,20 +41,19 @@
 #include <X11/Xatom.h>
 #include <exevents.h>
 
+#include <evdev-properties.h>
 #include "evdev.h"
 
 #ifdef HAVE_PROPERTIES
-static const char *propname_dlock = "Drag Lock Buttons";
-
 static Atom prop_dlock     = 0; /* Drag lock buttons. */
+#endif
 
 void EvdevDragLockLockButton(InputInfoPtr pInfo, unsigned int button);
-#endif
 
 
 /* Setup and configuration code */
 void
-EvdevDragLockInit(InputInfoPtr pInfo)
+EvdevDragLockPreInit(InputInfoPtr pInfo)
 {
     EvdevPtr pEvdev = (EvdevPtr)pInfo->private;
     char *option_string = NULL;
@@ -212,6 +211,72 @@ EvdevDragLockFilterEvent(InputInfoPtr pInfo, unsigned int button, int value)
 
 #ifdef HAVE_PROPERTIES
 /**
+ * Set the drag lock property.
+ * If only one value is supplied, then this is used as the meta button.
+ * If more than one value is supplied, then each value is the drag lock button
+ * for the pair. 0 disables a pair.
+ * i.e. to set bt 3 to draglock button 1, supply 0,0,1
+ */
+int
+EvdevDragLockSetProperty(DeviceIntPtr dev, Atom atom, XIPropertyValuePtr val,
+                         BOOL checkonly)
+{
+    InputInfoPtr pInfo  = dev->public.devicePrivate;
+    EvdevPtr     pEvdev = pInfo->private;
+
+    if (atom == prop_dlock)
+    {
+        int i;
+
+        if (val->format != 8 || val->type != XA_INTEGER)
+            return BadMatch;
+
+        /* Don't allow changes while a lock is active */
+        if (pEvdev->dragLock.meta)
+        {
+            if (pEvdev->dragLock.meta_state)
+                return BadAccess;
+        } else
+        {
+            for (i = 0; i < EVDEV_MAXBUTTONS; i++)
+                if (pEvdev->dragLock.lock_state[i])
+                    return BadValue;
+        }
+
+        if (val->size == 1)
+        {
+            int meta = *((CARD8*)val->data);
+            if (meta > EVDEV_MAXBUTTONS)
+                return BadValue;
+
+            if (!checkonly)
+            {
+                pEvdev->dragLock.meta = meta;
+                memset(pEvdev->dragLock.lock_pair, 0, sizeof(pEvdev->dragLock.lock_pair));
+            }
+        } else
+        {
+            CARD8* vals = (CARD8*)val->data;
+
+            for (i = 0; i < val->size && i < EVDEV_MAXBUTTONS; i++)
+                if (vals[i] > EVDEV_MAXBUTTONS)
+                    return BadValue;
+
+            if (!checkonly)
+            {
+                pEvdev->dragLock.meta = 0;
+                memset(pEvdev->dragLock.lock_pair, 0, sizeof(pEvdev->dragLock.lock_pair));
+
+                for (i = 0; i < val->size && i < EVDEV_MAXBUTTONS; i++)
+                    pEvdev->dragLock.lock_pair[i] = vals[i];
+            }
+        }
+    }
+
+    return Success;
+}
+
+/**
  * Initialise property for drag lock buttons setting.
  */
 void
@@ -223,7 +288,7 @@ EvdevDragLockInitProperty(DeviceIntPtr dev)
     if (!dev->button) /* don't init prop for keyboards */
         return;
 
-    prop_dlock = MakeAtom((char*)propname_dlock, strlen(propname_dlock), TRUE);
+    prop_dlock = MakeAtom(EVDEV_PROP_DRAGLOCK, strlen(EVDEV_PROP_DRAGLOCK), TRUE);
     if (pEvdev->dragLock.meta)
     {
         XIChangeDeviceProperty(dev, prop_dlock, XA_INTEGER, 8,
@@ -247,65 +312,7 @@ EvdevDragLockInitProperty(DeviceIntPtr dev)
 
     XISetDevicePropertyDeletable(dev, prop_dlock, FALSE);
 
-    return;
+    XIRegisterPropertyHandler(dev, EvdevDragLockSetProperty, NULL, NULL);
 }
 
-/**
- * Set the drag lock property.
- * If only one value is supplied, then this is used as the meta button.
- * If more than one value is supplied, then each value is the drag lock button
- * for the pair. 0 disables a pair.
- * i.e. to set bt 3 to draglock button 1, supply 0,0,1
- */
-int
-EvdevDragLockSetProperty(DeviceIntPtr dev, Atom atom, XIPropertyValuePtr val)
-{
-    InputInfoPtr pInfo  = dev->public.devicePrivate;
-    EvdevPtr     pEvdev = pInfo->private;
-
-    if (atom == prop_dlock)
-    {
-        int i;
-
-        if (val->format != 8 || val->type != XA_INTEGER)
-            return FALSE;
-
-        /* Don't allow changes while a lock is active */
-        if (pEvdev->dragLock.meta)
-        {
-            if (pEvdev->dragLock.meta_state)
-                return BadAccess;
-        } else
-        {
-            for (i = 0; i < EVDEV_MAXBUTTONS; i++)
-                if (pEvdev->dragLock.lock_state[i])
-                    return BadValue;
-        }
-
-        if (val->size == 1)
-        {
-            int meta = *((CARD8*)val->data);
-            if (meta > EVDEV_MAXBUTTONS)
-                return BadValue;
-
-            pEvdev->dragLock.meta = meta;
-            memset(pEvdev->dragLock.lock_pair, 0, sizeof(pEvdev->dragLock.lock_pair));
-        } else
-        {
-            CARD8* vals = (CARD8*)val->data;
-
-            for (i = 0; i < val->size && i < EVDEV_MAXBUTTONS; i++)
-                if (vals[i] > EVDEV_MAXBUTTONS)
-                    return BadValue;
-
-            pEvdev->dragLock.meta = 0;
-            memset(pEvdev->dragLock.lock_pair, 0, sizeof(pEvdev->dragLock.lock_pair));
-
-            for (i = 0; i < val->size && i < EVDEV_MAXBUTTONS; i++)
-                pEvdev->dragLock.lock_pair[i] = vals[i];
-        }
-    }
-
-    return Success;
-}
 #endif

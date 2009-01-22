@@ -4,24 +4,33 @@ Priority: optional
 Maintainer: Ubuntu X-SWAT <ubuntu-x@lists.ubuntu.com>
 XSBC-Original-Maintainer: Debian X Strike Force <debian-x@lists.debian.org>
 Uploaders: David Nusinow <dnusinow@debian.org>, Drew Parsons <dparsons@debian.org>, Julien Cristau <jcristau@debian.org>
-Build-Depends: debhelper (>= 5.0.0), pkg-config, quilt, xserver-xorg-dev (>= 2:1.5.1-1ubuntu3), x11proto-core-dev, x11proto-randr-dev, x11proto-input-dev (>= 1.4.3-2ubuntu3), x11proto-kb-dev, libxkbfile-dev, dpkg-dev (>= 1.14.17), automake, libtool, xutils-dev
+Build-Depends:
+ debhelper (>= 5.0.0),
+ pkg-config,
+ quilt,
+ xserver-xorg-dev (>= 2:1.5.99.901),
+ x11proto-core-dev,
+ x11proto-randr-dev,
+ x11proto-input-dev,
+ x11proto-kb-dev,
+ libxkbfile-dev,
+ dpkg-dev (>= 1.14.17),
+ automake,
+ libtool,
+ xutils-dev
 Standards-Version: 3.7.3
 Vcs-Git: git://git.debian.org/git/pkg-xorg/driver/xserver-xorg-input-evdev
 Vcs-Browser: http://git.debian.org/?p=pkg-xorg/driver/xserver-xorg-input-evdev.git
 
 Package: xserver-xorg-input-evdev
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, ${xserver:Depends}, xserver-xorg-core (>= 2:1.5.3)
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${xserver:Depends}
 Provides: ${xinpdriver:Provides}
 Replaces: xserver-xorg (<< 6.8.2-35)
 Description: X.Org X server -- evdev input driver
  This package provides the driver for input devices using evdev, the Linux
  kernel's event delivery mechanism.  This driver allows for multiple keyboards
- and mice to be treated as separate input devices, and matched on physical
- attributes such as which USB port they're connected to.
- .
- Note that this driver is different from Protocol "evdev" in the keyboard and
- mouse drivers, as shipped with Ubuntu 4.10 and 5.04, and Debian 3.1.
+ and mice to be treated as separate input devices.
  .
  More information about X.Org can be found at:
  <URL:http://www.X.org>

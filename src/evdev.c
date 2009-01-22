@@ -236,7 +236,7 @@ static void
 PostKbdEvent(InputInfoPtr pInfo, struct input_event *ev, int value)
 {
     int code = ev->code + MIN_KEYCODE;
-    static char warned[KEY_MAX];
+    static char warned[KEY_CNT];
 
     /* filter repeat events for chording keys */
     if (value == 2 &&
@@ -248,7 +248,7 @@ PostKbdEvent(InputInfoPtr pInfo, struct input_event *ev, int value)
          ev->code == KEY_SCROLLLOCK)) /* XXX windows keys? */
         return;
 
-    if (code > 255 && ev->code < KEY_MAX) {
+    if (code > 255 && ev->code <= KEY_MAX) {
 	if (!warned[ev->code])
 	    xf86Msg(X_WARNING, "%s: unable to handle keycode %d\n",
 		    pInfo->name, ev->code);
@@ -853,7 +853,7 @@ EvdevAddKeyClass(DeviceIntPtr device)
         SetXkbOption(pInfo, "xkb_rules", &pEvdev->xkb_rules);
         SetXkbOption(pInfo, "xkb_model", &pEvdev->xkb_model);
 	if (!pEvdev->xkb_model)
-	    SetXkbOption(pInfo, "XkbModel", &pEvdev->xkb_rules);
+	    SetXkbOption(pInfo, "XkbModel", &pEvdev->xkb_model);
         SetXkbOption(pInfo, "xkb_layout", &pEvdev->xkb_layout);
 	if (!pEvdev->xkb_layout)
 	    SetXkbOption(pInfo, "XkbLayout", &pEvdev->xkb_layout);
@@ -1149,6 +1149,8 @@ EvdevProc(DeviceIntPtr device, int what)
         return EvdevOn(device);
 
     case DEVICE_OFF:
+        if (pEvdev->flags & EVDEV_INITIALIZED)
+            EvdevMBEmuFinalize(pInfo);
         if (pInfo->fd != -1)
         {
             if (pEvdev->grabDevice && ioctl(pInfo->fd, EVIOCGRAB, (void *)0))
@@ -1199,12 +1201,12 @@ EvdevCacheCompare(InputInfoPtr pInfo, BOOL compare)
     int i;
 
     char name[1024]                  = {0};
-    long bitmask[NBITS(EV_MAX)]      = {0};
-    long key_bitmask[NBITS(KEY_MAX)] = {0};
-    long rel_bitmask[NBITS(REL_MAX)] = {0};
-    long abs_bitmask[NBITS(ABS_MAX)] = {0};
-    long led_bitmask[NBITS(LED_MAX)] = {0};
-    struct input_absinfo absinfo[ABS_MAX];
+    long bitmask[NLONGS(EV_CNT)]      = {0};
+    long key_bitmask[NLONGS(KEY_CNT)] = {0};
+    long rel_bitmask[NLONGS(REL_CNT)] = {0};
+    long abs_bitmask[NLONGS(ABS_CNT)] = {0};
+    long led_bitmask[NLONGS(LED_CNT)] = {0};
+    struct input_absinfo absinfo[ABS_CNT];
 
     if (ioctl(pInfo->fd,
               EVIOCGNAME(sizeof(name) - 1), name) < 0) {
@@ -1263,7 +1265,7 @@ EvdevCacheCompare(InputInfoPtr pInfo, BOOL compare)
 
     memset(absinfo, 0, sizeof(absinfo));
 
-    for (i = 0; i < ABS_MAX; i++)
+    for (i = ABS_X; i <= ABS_MAX; i++)
     {
         if (TestBit(i, abs_bitmask))
         {
@@ -1299,9 +1301,9 @@ error:
 static int
 EvdevProbe(InputInfoPtr pInfo)
 {
-    long key_bitmask[NBITS(KEY_MAX)] = {0};
-    long rel_bitmask[NBITS(REL_MAX)] = {0};
-    long abs_bitmask[NBITS(ABS_MAX)] = {0};
+    long key_bitmask[NLONGS(KEY_CNT)] = {0};
+    long rel_bitmask[NLONGS(REL_CNT)] = {0};
+    long abs_bitmask[NLONGS(ABS_CNT)] = {0};
     int i, has_axes, has_keys, num_buttons;
     int kernel24 = 0;
     EvdevPtr pEvdev = pInfo->private;

@@ -1,3 +1,113 @@
+commit 11d506dce6363525e80eda219aee8af429fb302e
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue Jan 13 11:32:05 2009 +1000
+
+    evdev 2.1.1
+
+commit a34a2cd3476441f29c9faa79ffa9289dbf2eebf4
+Author: Michael Chapman <mike@very.puzzling.org>
+Date:   Fri Jan 9 19:07:10 2009 +1100
+
+    Disable middle mouse button emulation when a middle mouse button event is registered
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    (cherry picked from commit 0592d97fbb5a1241ee79397ce9203346d050a9f9)
+
+commit 78c00bd77f983aa22611c9966fbcb7e22453b588
+Author: Matt Helsley <matt.helsley@gmail.com>
+Date:   Tue Jan 13 11:03:04 2009 +1000
+
+    Fix FOO_MAX off-by-one
+    
+    In linux/input.h each section's (e.g. ABS) FOO_MAX is the maximum FOO
+    value. Recent kernels define FOO_CNT as the maximum number of FOO there
+    will ever be. Hence using FOO_MAX to size the bit vectors representing
+    the capabilities of an evdev device is off by one.
+    
+    Define FOO_CNT values for use with Linux kernels which lack them. Use
+    FOO_CNT whenever we need to know the number of bits needed -- usually to
+    calculate the number of longs needed.
+    
+    When iterating over the values FOO_MAX still seems appropriate however
+    the loop test should include FOO_MAX rather than skip it.
+    
+    Signed-off-by: Matt Helsley <matt.helsley@gmail.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    (cherry picked from commit 4dfd86b2201b2b19761a1abb3c580cecf0060224)
+    
+    Conflicts:
+    
+    	src/evdev.c
+
+commit 760f1c6bb184e3b48ca6a6bfe8942d306f378148
+Author: Matt Helsley <matt.helsley@gmail.com>
+Date:   Sun Jan 11 18:04:40 2009 -0800
+
+    rename NBITS to NLONGS to reflect its actual meaning
+    
+    NBITS really convers the number of bits passed as its argument
+    into a number of longs. This is somewhat atypical of many
+    function-like-macro names. Rename it to NLONGS.
+    
+    Signed-off-by: Matt Helsley <matt.helsley@gmail.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    
+    (cherry-picked from commit d3fd42d8644310abcae23bbf534f8c445296bcb7)
+    Not really required, but it makes cherry-picking
+    4dfd86b2201b2b19761a1abb3c580cecf0060224 easier.
+
+commit 2db04ba3c35e4976b34d92f8f7c6c2c9ec09f3ab
+Author: Alan Coopersmith <alan.coopersmith@sun.com>
+Date:   Fri Jan 9 16:13:09 2009 -0800
+
+    Remove xorgconfig & xorgcfg from See Also list in man page
+    (cherry picked from commit 0f0a149067abdd1ed89717de43febe89b2a3490b)
+
+commit 363d0bdb9fcae7f57f53c50667429ac9b37d41cc
+Author: Yan Li <yan.i.li@intel.com>
+Date:   Mon Jan 5 16:35:09 2009 +0800
+
+    Fix XkbModel parsing error
+    
+    Signed-off-by: Yan Li <yan.i.li@intel.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    (cherry picked from commit d170cba0cdd8f7a2e500e094f5b21fc33aefb52a)
+
+commit 16a26a1eca6395284fcb8e62be7b2bc30becb0d3
+Author: Peter Hutterer <peter.hutterer@redhat.com>
+Date:   Wed Nov 26 15:01:57 2008 +1000
+
+    Finalize MB emu (and wakeup handlers) before closing the fd.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@redhat.com>
+    (cherry picked from commit 2bf6e29b40f0da2bc417964fd2bd819306e5d3ed)
+
+commit b879ae73510ad733c266fba80e0ec4b0f903e71b
+Author: Peter Hutterer <peter.hutterer@redhat.com>
+Date:   Mon Nov 17 09:27:25 2008 +1000
+
+    evdev 2.1
+
+commit 53566b7d4d7e641df4db5720ae9132eb4c812c84
+Author: Peter Hutterer <peter.hutterer@redhat.com>
+Date:   Mon Nov 17 10:03:11 2008 +1000
+
+    Store device file's minor/major to avoid duplicate devices.
+    
+    Devices added that use the same min/maj as an already added device are ignored
+    by the driver. This way users can have an xorg.conf entry on
+    /dev/input/by-id/blahblah and not get the same device added by HAL.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@redhat.com>
+    (cherry picked from commit 63af314368cec47b6b8266db331f2c820e7a071f)
+
+commit 29c2765fc30c74171e51ba694ea4810916803c31
+Author: Fernando Carrijo <fcarrijo@yahoo.com.br>
+Date:   Thu Nov 6 13:20:16 2008 -0500
+
+    Fix error message
+    (cherry picked from commit 4c5c9c111d406e5590429377262b86e91868ef76)
+
 commit 7ef4e2c5e14e558f41fb7f411e2976f517b6b526
 Author: Peter Hutterer <peter.hutterer@redhat.com>
 Date:   Mon Nov 3 13:47:15 2008 +1030

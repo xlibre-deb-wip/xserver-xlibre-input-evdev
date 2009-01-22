@@ -1,3 +1,37 @@
+xserver-xorg-input-evdev (1:2.1.1-1) experimental; urgency=low
+
+  * New upstream release.
+  * Update debian/copyright from upstream's COPYING.
+  * Build against xserver 1.6 rc1.
+
+ -- Julien Cristau <jcristau@debian.org>  Wed, 21 Jan 2009 21:58:47 +0100
+
+xserver-xorg-input-evdev (1:2.1.0-1) experimental; urgency=low
+
+  [ Timo Aaltonen ]
+  * New upstream release.
+    + Store device file's minor/major to avoid duplicate devices
+      (closes: #505635)
+
+  [ Julien Cristau ]
+  * debian/control: update the long description.  We don't do "clever" device
+    matching anymore, that's hal/udev's job.  Also drop the mention of
+    'Protocol "evdev"', which unexists since quite a while.
+
+ -- Julien Cristau <jcristau@debian.org>  Wed, 26 Nov 2008 19:27:26 +0100
+
+xserver-xorg-input-evdev (1:2.1.0-0ubuntu3) jaunty; urgency=low
+
+  * Rebuild against new xorg-server for armel.
+
+ -- Loic Minier <lool@dooz.org>  Fri, 19 Dec 2008 14:53:31 +0100
+
+xserver-xorg-input-evdev (1:2.1.0-0ubuntu2) jaunty; urgency=low
+
+  * Rebuild against the new xserver.
+
+ -- Timo Aaltonen <tjaalton@ubuntu.com>  Mon, 15 Dec 2008 11:49:48 +0200
+
 xserver-xorg-input-evdev (1:2.1.0-0ubuntu1) jaunty; urgency=low
 
   * Merge from Debian experimental, remaining changes:
@@ -7,12 +41,6 @@ xserver-xorg-input-evdev (1:2.1.0-0ubuntu1) jaunty; urgency=low
   * Don't install the fdi file, hal in ubuntu already ships one.
 
  -- Timo Aaltonen <tepsipakki@ubuntu.com>  Wed, 26 Nov 2008 14:06:08 +0200
-
-xserver-xorg-input-evdev (1:2.1.0-1) UNRELEASED; urgency=low
-
-  * New upstream release.
-
- -- Timo Aaltonen <tepsipakki@ubuntu.com>  Wed, 19 Nov 2008 15:34:39 +0200
 
 xserver-xorg-input-evdev (1:2.0.99.3-1) experimental; urgency=low
 

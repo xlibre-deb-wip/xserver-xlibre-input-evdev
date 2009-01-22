@@ -1,11 +1,11 @@
-xserver-xorg-input-evdev (1:2.1.1-1ubuntu1) UNRELEASED; urgency=low
+xserver-xorg-input-evdev (1:2.1.1-1ubuntu1) jaunty; urgency=low
 
   * Merge with Debian experimental, remaining changes:
     - Don't install the fdi file, hal in ubuntu already ships one.
   * Drop 100_dont_check_abi.patch, since the new xserver has a higher
     INPUT_ABI already.
 
- -- Timo Aaltonen <tjaalton@ubuntu.com>  Thu, 22 Jan 2009 15:18:05 +0200
+ -- Timo Aaltonen <tjaalton@ubuntu.com>  Thu, 22 Jan 2009 15:22:17 +0200
 
 xserver-xorg-input-evdev (1:2.1.1-1) experimental; urgency=low
 

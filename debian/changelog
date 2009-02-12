@@ -1,3 +1,23 @@
+xserver-xorg-input-evdev (1:2.1.1-1ubuntu3) jaunty; urgency=low
+
+  * Add 101_evdevcachecompare_errmsgs.patch: Provides more specific error
+    messages to assist in debugging issues where currently it merely says,
+    "Device has changed - disabling", such as in 327175.
+
+ -- Bryce Harrington <bryce@ubuntu.com>  Thu, 12 Feb 2009 09:09:49 -0800
+
+xserver-xorg-input-evdev (1:2.1.1-1ubuntu2) jaunty; urgency=low
+
+  * Add 100_exclude_touchscreen_pos.patch as cherry-pick from upstream:
+    EvdevCacheCompare fails because it also compares all values of
+    input_absinfo structure, which include the last tapped position of the
+    touchscreen (.value field). This is never updated in the cache, and
+    anyway it could change anytime if the screen is touched while away
+    from the X virtual console.
+    (LP: #322946)
+
+ -- Bryce Harrington <bryce@ubuntu.com>  Mon, 09 Feb 2009 14:31:19 -0800
+
 xserver-xorg-input-evdev (1:2.1.1-1ubuntu1) jaunty; urgency=low
 
   * Merge with Debian experimental, remaining changes:

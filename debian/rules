@@ -43,7 +43,7 @@ obj-$(DEB_BUILD_GNU_TYPE)/config.status: configure
 	             --infodir=\$${prefix}/share/info $(confflags) \
 	             CFLAGS="$(CFLAGS)" 
 
-build: patch build-stamp
+build: build-stamp
 build-stamp: obj-$(DEB_BUILD_GNU_TYPE)/config.status
 	dh_testdir
 	cd obj-$(DEB_BUILD_GNU_TYPE) && $(MAKE)

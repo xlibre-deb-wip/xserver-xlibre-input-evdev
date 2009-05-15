@@ -1,9 +1,9 @@
-xserver-xorg-input-evdev (1:2.2.2-1ubuntu1) UNRELEASED; urgency=low
+xserver-xorg-input-evdev (1:2.2.2-1ubuntu1) karmic; urgency=low
 
   * Merge from Debian unstable, remaining changes:
     - Don't install the fdi file, hal in ubuntu already ships one.
 
- -- Timo Aaltonen <tjaalton@ubuntu.com>  Fri, 15 May 2009 12:31:40 +0300
+ -- Timo Aaltonen <tjaalton@ubuntu.com>  Fri, 15 May 2009 12:40:30 +0300
 
 xserver-xorg-input-evdev (1:2.2.2-1) unstable; urgency=low
 

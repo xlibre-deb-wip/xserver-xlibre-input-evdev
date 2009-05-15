@@ -3,7 +3,7 @@ Section: x11
 Priority: optional
 Maintainer: Ubuntu X-SWAT <ubuntu-x@lists.ubuntu.com>
 XSBC-Original-Maintainer: Debian X Strike Force <debian-x@lists.debian.org>
-Uploaders: David Nusinow <dnusinow@debian.org>, Drew Parsons <dparsons@debian.org>, Julien Cristau <jcristau@debian.org>
+Uploaders: David Nusinow <dnusinow@debian.org>, Drew Parsons <dparsons@debian.org>, Julien Cristau <jcristau@debian.org>, Brice Goglin <bgoglin@debian.org>
 Build-Depends:
  debhelper (>= 5.0.0),
  pkg-config,

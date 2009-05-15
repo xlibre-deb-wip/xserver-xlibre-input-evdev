@@ -1,8 +1,22 @@
-xserver-xorg-input-evdev (1:2.1.1-1ubuntu4) UNRELEASED; urgency=low
+xserver-xorg-input-evdev (1:2.2.2-1ubuntu1) UNRELEASED; urgency=low
 
   * rules:  Adding 'patch' to the build task appears to be unnecessary.
 
  -- Bryce Harrington <bryce@ubuntu.com>  Thu, 12 Feb 2009 14:04:47 -0800
+
+xserver-xorg-input-evdev (1:2.2.2-1) unstable; urgency=low
+
+  * New upstream release.
+  * Add myself to Uploaders.
+
+ -- Brice Goglin <bgoglin@debian.org>  Thu, 30 Apr 2009 08:59:58 +0200
+
+xserver-xorg-input-evdev (1:2.2.1-1) unstable; urgency=low
+
+  * New upstream release.
+  * Upload to unstable.
+
+ -- Julien Cristau <jcristau@debian.org>  Thu, 09 Apr 2009 01:16:36 +0100
 
 xserver-xorg-input-evdev (1:2.1.1-1ubuntu3) jaunty; urgency=low
 

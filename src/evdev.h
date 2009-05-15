@@ -35,10 +35,7 @@
 
 #include <xf86Xinput.h>
 #include <xf86_OSproc.h>
-
-#ifdef XKB
 #include <xkbstr.h>
-#endif
 
 #ifndef EV_CNT /* linux 2.4 kernels and earlier lack _CNT defines */
 #define EV_CNT (EV_MAX+1)
@@ -62,6 +59,22 @@
 #define HAVE_PROPERTIES 1
 #endif
 
+#ifndef MAX_VALUATORS
+#define MAX_VALUATORS 36
+#endif
+
+
+#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) < 5
+typedef struct {
+    char *rules;
+    char *model;
+    char *layout;
+    char *variant;
+    char *options;
+} XkbRMLVOSet;
+#endif
+
+
 #define LONG_BITS (sizeof(long) * 8)
 
 /* Number of longs needed to hold the given number of bits */
@@ -77,9 +90,12 @@ typedef struct {
 typedef struct {
     const char *device;
     int grabDevice;         /* grab the event device? */
-    int screen;
-    int min_x, min_y, max_x, max_y;
-    int abs_x, abs_y, old_x, old_y;
+
+    int num_vals;           /* number of valuators */
+    int axis_map[max(ABS_CNT, REL_CNT)]; /* Map evdev <axis> to index */
+    int vals[MAX_VALUATORS];
+    int old_vals[MAX_VALUATORS]; /* Translate absolute inputs to relative */
+
     int flags;
     int tool;
     int buttons;            /* number of buttons */
@@ -88,15 +104,11 @@ typedef struct {
     BOOL invert_y;
 
     /* XKB stuff has to be per-device rather than per-driver */
-    int noXkb;
-#ifdef XKB
-    char                    *xkb_rules;
-    char                    *xkb_model;
-    char                    *xkb_layout;
-    char                    *xkb_variant;
-    char                    *xkb_options;
+#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) < 5
     XkbComponentNamesRec    xkbnames;
 #endif
+    XkbRMLVOSet rmlvo;
+
     /* Middle mouse button emulation */
     struct {
         BOOL                enabled;
@@ -138,11 +150,11 @@ typedef struct {
 
     /* Cached info from device. */
     char name[1024];
-    long bitmask[NLONGS(EV_CNT)];
-    long key_bitmask[NLONGS(KEY_CNT)];
-    long rel_bitmask[NLONGS(REL_CNT)];
-    long abs_bitmask[NLONGS(ABS_CNT)];
-    long led_bitmask[NLONGS(LED_CNT)];
+    unsigned long bitmask[NLONGS(EV_CNT)];
+    unsigned long key_bitmask[NLONGS(KEY_CNT)];
+    unsigned long rel_bitmask[NLONGS(REL_CNT)];
+    unsigned long abs_bitmask[NLONGS(ABS_CNT)];
+    unsigned long led_bitmask[NLONGS(LED_CNT)];
     struct input_absinfo absinfo[ABS_CNT];
 
     /* minor/major number */

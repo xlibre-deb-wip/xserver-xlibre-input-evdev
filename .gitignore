@@ -21,6 +21,7 @@ missing
 *.lo
 *.la
 stamp-h1
-*.bz2
-*.gz
+xf86-input-evdev-*.tar.*
 *.pc
+*~
+tags

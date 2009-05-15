@@ -217,7 +217,7 @@ EvdevDragLockFilterEvent(InputInfoPtr pInfo, unsigned int button, int value)
  * for the pair. 0 disables a pair.
  * i.e. to set bt 3 to draglock button 1, supply 0,0,1
  */
-int
+static int
 EvdevDragLockSetProperty(DeviceIntPtr dev, Atom atom, XIPropertyValuePtr val,
                          BOOL checkonly)
 {
@@ -243,7 +243,9 @@ EvdevDragLockSetProperty(DeviceIntPtr dev, Atom atom, XIPropertyValuePtr val,
                     return BadValue;
         }
 
-        if (val->size == 1)
+        if (val->size == 0)
+            return BadMatch;
+        else if (val->size == 1)
         {
             int meta = *((CARD8*)val->data);
             if (meta > EVDEV_MAXBUTTONS)

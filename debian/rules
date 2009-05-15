@@ -7,7 +7,6 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-PACKAGE = xserver-xorg-input-evdev
 include debian/xsfbs/xsfbs.mk
 
 CFLAGS = -Wall -g

@@ -1,8 +1,9 @@
 xserver-xorg-input-evdev (1:2.2.2-1ubuntu1) UNRELEASED; urgency=low
 
-  * rules:  Adding 'patch' to the build task appears to be unnecessary.
+  * Merge from Debian unstable, remaining changes:
+    - Don't install the fdi file, hal in ubuntu already ships one.
 
- -- Bryce Harrington <bryce@ubuntu.com>  Thu, 12 Feb 2009 14:04:47 -0800
+ -- Timo Aaltonen <tjaalton@ubuntu.com>  Fri, 15 May 2009 12:31:40 +0300
 
 xserver-xorg-input-evdev (1:2.2.2-1) unstable; urgency=low
 

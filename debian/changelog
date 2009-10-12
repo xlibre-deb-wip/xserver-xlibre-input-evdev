@@ -1,3 +1,16 @@
+xserver-xorg-input-evdev (1:2.2.5-1ubuntu2) karmic; urgency=low
+
+  * Apply upstream patch from fd.org bug 23048 (LP: #343528)
+    Finalize the middle button emulation when a read error occurs (#23048)
+
+    If a read error occurs, remove the block and wakeup handlers for middle
+    mouse button emulation. Otherwise, they'll still be around after the device
+    has been reopened and overwritten with the new ones created by EvdevOn.
+    Once this happened, future removal of the device can lead to a server
+    crash.
+
+ -- Matt Zimmerman <mdz@ubuntu.com>  Sun, 11 Oct 2009 09:47:44 +0100
+
 xserver-xorg-input-evdev (1:2.2.2-1ubuntu2) karmic; urgency=low
 
   * Add 100_mbemu_nullptr.patch:  Null pointer checks for MBEmu*().

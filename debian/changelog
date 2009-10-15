@@ -1,4 +1,12 @@
-xserver-xorg-input-evdev (1:2.2.5-1ubuntu2) karmic; urgency=low
+xserver-xorg-input-evdev (1:2.2.5-1ubuntu4) karmic; urgency=low
+
+  * local/evoluent-verticalmouse3.fdi, rules: Add support for Kingsis
+    Evoluent VerticalMouse 3.
+    (LP: #451729)
+
+ -- Bryce Harrington <bryce@ubuntu.com>  Wed, 14 Oct 2009 20:21:50 -0700
+
+xserver-xorg-input-evdev (1:2.2.5-1ubuntu3) karmic; urgency=low
 
   * Apply upstream patch from fd.org bug 23048 (LP: #343528)
     Finalize the middle button emulation when a read error occurs (#23048)

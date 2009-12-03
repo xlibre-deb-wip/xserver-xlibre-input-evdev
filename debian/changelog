@@ -1,3 +1,21 @@
+xserver-xorg-input-evdev (1:2.3.1-1) experimental; urgency=low
+
+  * New upstream release.
+    + Finalize the middle button emulation when a read error occurs
+      (closes: #550970, #552012)
+  * Replace the fdi file with an udev rule.
+
+ -- Julien Cristau <jcristau@debian.org>  Sat, 28 Nov 2009 20:42:52 +0100
+
+xserver-xorg-input-evdev (1:2.2.99.1-1) experimental; urgency=low
+
+  * New upstream snapshot.
+  * Bump build-dep on xutils-dev for new xorg-macros.
+  * Build against xserver 1.7 RC.
+  * Bump Standards-Version to 3.8.3.
+
+ -- Julien Cristau <jcristau@debian.org>  Tue, 29 Sep 2009 21:04:26 +0200
+
 xserver-xorg-input-evdev (1:2.2.5-1ubuntu7) lucid; urgency=low
 
   * 102_set_all_valuators_for_relative_motion_events.patch:

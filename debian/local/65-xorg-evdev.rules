@@ -1,0 +1,9 @@
+ACTION!="add", GOTO="xorg_evdev_end"
+SUBSYSTEM!="input", GOTO="xorg_evdev_end"
+KERNEL!="event*", GOTO="xorg_evdev_end"
+
+# By default, we use the -evdev driver for every input device; later rules can
+# then change the driver for specific input devices.
+ENV{x11_driver}="evdev"
+
+LABEL="xorg_evdev_end"

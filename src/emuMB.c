@@ -198,7 +198,7 @@ EvdevMBEmuTimer(InputInfoPtr pInfo)
 
     pEvdev->emulateMB.pending = FALSE;
     if ((id = stateTab[pEvdev->emulateMB.state][4][0]) != 0) {
-        xf86PostButtonEvent(pInfo->dev, 0, abs(id), (id >= 0), 0, 0);
+        EvdevPostButtonEvent(pInfo, abs(id), (id >= 0));
         pEvdev->emulateMB.state =
             stateTab[pEvdev->emulateMB.state][4][2];
     } else {
@@ -248,12 +248,12 @@ EvdevMBEmuFilterEvent(InputInfoPtr pInfo, int button, BOOL press)
 
     if ((id = stateTab[pEvdev->emulateMB.state][*btstate][0]) != 0)
     {
-        xf86PostButtonEvent(pInfo->dev, 0, abs(id), (id >= 0), 0, 0);
+        EvdevQueueButtonEvent(pInfo, abs(id), (id >= 0));
         ret = TRUE;
     }
     if ((id = stateTab[pEvdev->emulateMB.state][*btstate][1]) != 0)
     {
-        xf86PostButtonEvent(pInfo->dev, 0, abs(id), (id >= 0), 0, 0);
+        EvdevQueueButtonEvent(pInfo, abs(id), (id >= 0));
         ret = TRUE;
     }
 
@@ -327,6 +327,9 @@ EvdevMBEmuPreInit(InputInfoPtr pInfo)
 void
 EvdevMBEmuOn(InputInfoPtr pInfo)
 {
+    if (!pInfo->dev->button) /* don't init for keyboards */
+        return;
+
     RegisterBlockAndWakeupHandlers (EvdevMBEmuBlockHandler,
                                     EvdevMBEmuWakeupHandler,
                                     (pointer)pInfo);
@@ -335,6 +338,9 @@ EvdevMBEmuOn(InputInfoPtr pInfo)
 void
 EvdevMBEmuFinalize(InputInfoPtr pInfo)
 {
+    if (!pInfo->dev->button) /* don't cleanup for keyboards */
+        return;
+
     RemoveBlockAndWakeupHandlers (EvdevMBEmuBlockHandler,
                                   EvdevMBEmuWakeupHandler,
                                   (pointer)pInfo);

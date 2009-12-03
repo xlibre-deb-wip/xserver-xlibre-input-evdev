@@ -26,7 +26,7 @@ xserver-xorg-input-evdev (1:2.2.5-1ubuntu4) karmic; urgency=low
 
  -- Bryce Harrington <bryce@ubuntu.com>  Wed, 14 Oct 2009 20:21:50 -0700
 
-xserver-xorg-input-evdev (1:2.2.5-1ubuntu3) karmic; urgency=low
+xserver-xorg-input-evdev (1:2.2.5-1ubuntu2) karmic; urgency=low
 
   * Apply upstream patch from fd.org bug 23048 (LP: #343528)
     Finalize the middle button emulation when a read error occurs (#23048)
@@ -38,6 +38,34 @@ xserver-xorg-input-evdev (1:2.2.5-1ubuntu3) karmic; urgency=low
     crash.
 
  -- Matt Zimmerman <mdz@ubuntu.com>  Sun, 11 Oct 2009 09:47:44 +0100
+
+xserver-xorg-input-evdev (1:2.2.5-1ubuntu1) karmic; urgency=low
+
+  * Merge from debian unstable, remaining changes:
+    - Don't install the fdi file, hal in ubuntu already ships one.
+
+ -- Bryce Harrington <bryce@ubuntu.com>  Wed, 02 Sep 2009 17:00:08 -0700
+
+xserver-xorg-input-evdev (1:2.2.5-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Brice Goglin <bgoglin@debian.org>  Fri, 21 Aug 2009 07:18:07 +0200
+
+xserver-xorg-input-evdev (1:2.2.4-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Brice Goglin <bgoglin@debian.org>  Thu, 06 Aug 2009 07:29:42 +0200
+
+xserver-xorg-input-evdev (1:2.2.3-1) unstable; urgency=low
+
+  * New upstream release.
+    + Fix corrupted mouse motion events sending pointer to
+      top-left of screen, cloces: #528994.
+  * Add README.source, bump Standards-Version to 3.8.2.
+
+ -- Brice Goglin <bgoglin@debian.org>  Thu, 30 Jul 2009 09:14:44 +0200
 
 xserver-xorg-input-evdev (1:2.2.2-1ubuntu2) karmic; urgency=low
 

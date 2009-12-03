@@ -1,10 +1,708 @@
-commit cf887a2b7cff9eb99c872a9cf5a9382ff6317899
+commit 4f05afd495214ad48ffab7bdb1cde69aacc5af8f
 Author: Peter Hutterer <peter.hutterer@who-t.net>
-Date:   Thu Apr 30 16:39:15 2009 +1000
+Date:   Fri Nov 20 11:18:03 2009 +1000
 
-    evdev 2.2.2
+    evdev 2.3.1
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
 
-commit 1cc0651e1b44af505d7177b22c6083eae9b118cc
+commit c6964dd28a114e23de21f91c0323ae4f03fb0f16
+Author: Bartosz Brachaczek <b.brachaczek@gmail.com>
+Date:   Fri Nov 13 00:18:00 2009 +1000
+
+    Set all valuators for relative motion events (#24737)
+    
+    We should process all the deltas reported by a relative motion device,
+    otherwise some devices such as A4Tech X-750F or similar may trigger a
+    situation when the `v` array contains random values (it isn't
+    initialized anywhere) and later we process them and in effect the mouse
+    cursor "jumps" on the screen.
+    I'm not sure why, but we also must be sure that the `first` and `last`
+    variables reflect the axis map, otherwise the mouse cursor "jumps" on
+    the screen when clicking mouse buttons in some rare cases reported by
+    Bartek Iwaniec on Bugzilla. That's why a simple initialization of the
+    `v` array with zeros isn't sufficient.
+    
+    X.Org Bug 24737 <http://bugs.freedesktop.org/show_bug.cgi?id=24737>
+    
+    Signed-off-by: Bartosz Brachaczek <b.brachaczek@gmail.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    (cherry picked from commit c1f16a4f59a584ab4546c2f16e20b06703042057)
+
+commit 175af93bdb5928236e5c402a77d164313497d72a
+Author: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Date:   Mon Nov 2 23:11:55 2009 -0800
+
+    Relax checks when reopening devices
+    
+    When checking whether we are dealing with the same device as before
+    when we try to reopen it evdev should not require exact match of
+    entire keymap. Users should be allowed to adjust keymaps to better
+    match their hardware even after X starts. However we don't expect
+    changes in [BTN_MISC, KEY_OK) range since these codes are reserved for
+    mice, joysticks, tablets and so forth, so we will limit the check to
+    this range.
+    
+    The same goes for absinfo - limits can change and it should not result
+    in device being disabled.
+    
+    Also check the length of the data returned by ioctl and don't try to
+    compare more than we were given.
+    
+    [peter: moved the key comparison below the led+abs comparison]
+    
+    Signed-off-by: Dmitry Torokhov <dtor@mail.ru>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    (cherry picked from commit a0f7f34dc5effc5822c618bfbf3a0872669c30ad)
+
+commit 7c3c7f83d02c611d9660a6f6ef4201b71017d42d
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Mon Nov 2 13:57:18 2009 +1000
+
+    Fix drag-lock property handler for multiple draglock buttons.
+    
+    Parsing of the values was wrong. Given an input of 1 2 3 4, button 1 sets
+    the lock for button 2 and button 3 sets the lock for button 4.
+    
+    This also means we need to return BadMatch if the property isn't a multiple
+    of 2.
+    
+    Red Hat Bug 524428 <https://bugzilla.redhat.com/show_bug.cgi?id=524428>
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    (cherry picked from commit 11669d82790fd7c94c44c0d487d3fa5e203528e9)
+
+commit aa6399fdb9ec970e205b1efb336338ac870d2bcf
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Mon Oct 19 11:40:24 2009 +1000
+
+    evdev 2.3.0
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 1d86f5dec16beaf9391f320d7702cc59e9486bf4
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu Oct 15 11:13:47 2009 +1000
+
+    Convert IgnoreAbsolute/RelativeAxes options into trinary state.
+    
+    The Xen Virtual Pointer device exports both absolute and relative axes from
+    the kernel device. Which coordinates are used is a run-time decision and
+    depends on the host-specific configuration.
+    0a3657d2ee62f4086e9687218cb33835ba61a0b3 broke these devices, and they are
+    now unusable out-of-the-box as there is no configuration to cover them.
+    
+    This patch converts the IgnoreAbsoluteAxes and the IgnoreRelativeAxes
+    configuration options into a trinary state.
+    1. If unset, configure the device as normal by trying to guess the right
+       axis setup.
+    2. If set to true, ignore the specific axis type completely (except for
+       wheel events).
+    3. If set to false, explicitly 'unignore' the axis type, alwas configuring
+       it if it is present on the device. This setting introduces seemingly
+       buggy behaviour (see Bug 21832)
+    
+    1. and 2. replicate the current driver behaviour.
+    The result of 3. is that is that if a device has absolute axes and the
+    options set to false, both axes will be initialized (absolute last to get
+    clipping right). This requires axis labelling priorty to switch from
+    relative first to absolute first.
+    
+    Relative events are forwarded into the server through the absolute axes,
+    the server scales this into the device absolute range and everyone is happy.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit fbd86e2530f3f69f397d3bae9ad87cf8e2d14221
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu Oct 15 10:52:27 2009 +1000
+
+    Fix copy/paste typo in comment.
+
+commit 9ea1f9a6954c8dceee17076f10ff0f82f042de88
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue Oct 13 10:49:46 2009 +1000
+
+    Fix typo, use uppercase like the other messages
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 57b54ee3995f2f678ef359e7663cad517a8b2433
+Author: Oliver McFadden <oliver.mcfadden@nokia.com>
+Date:   Mon Oct 12 16:32:51 2009 +0300
+
+    evdev: Support the "Calibration" string option.
+    
+    Originally based on a patch from Daniel Stone, this commit allows for
+    the calibration factors to be set either from Xorg.conf or via HAL.
+    
+    Previously the only way was via the properties interface.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit f2dc0681febd297d95dae7c9e3ae19b771af8420
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue Oct 6 19:09:33 2009 +1000
+
+    Finalize the middle button emulation when a read error occurs (#23048)
+    
+    If a read error occurs, remove the block and wakeup handlers for middle
+    mouse button emulation. Otherwise, they'll still be around after the device
+    has been reopened and overwritten with the new ones created by EvdevOn. Once
+    this happened, future removal of the device can lead to a server crash.
+    
+    X.Org Bug 23048 <http://bugs.freedesktop.org/show_bug.cgi?id=23048>
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 3fa49dfcab9081787840ed6bb9451cb73f65e248
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu Oct 8 14:26:41 2009 +1000
+
+    evdev 2.2.99.2
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 941391ca34a7537542f0bb894fc0f02e200165b4
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed Sep 30 12:05:17 2009 +1000
+
+    Add explicit options to ignore relative or absolute axes.
+    
+    The X server cannot deal with devices that have both relative and absolute
+    axes. Evdev tries to guess wich axes to ignore given the device type and
+    disables absolute axes for mice and relative axes for tablets, touchscreens
+    and touchpad. This guess is sometimes wrong and causes exitus felis
+    domesticae parvulae.
+    
+    Two new configuration options are provided to explicitly allow ignoring an
+    axis. Mouse wheel axes are exempt and will work even if relative axes are
+    ignored.  No property, this option must be set in the configuration.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Acked-by: Daniel Stone <daniel@fooishbar.org>
+
+commit 2144f7d83426136cc1a9de2fafb302683645c6da
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed Sep 30 11:49:21 2009 +1000
+
+    Remove unused has_xy.
+    
+    has_xy is only ever set, but not used for anything else.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 61b4e88e01f32e976f85e7970a7f5b21fcd84f97
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Mon Sep 21 16:56:28 2009 +1000
+
+    emuWheel: fix signed/unsigned screwup
+    
+    This patch fixes wheel emulation on buttons other than 0.
+    
+    Reported-by: Andy Neitzke
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 9ee70943ec304b08b8e4651c512a8e65fa13cc9c
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Sep 11 09:57:22 2009 +1000
+
+    Require xorg-macros 1.3 and XORG_DEFAULT_OPTIONS
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 415b6ffa958e3103eeb52af4ccd881497169eed4
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu Aug 20 11:02:31 2009 +1000
+
+    Only take the driver-internal button mapping to count buttons (#23405)
+    
+    Regression:
+        If a user has multiple buttons mapped to the same button number, the
+        number of buttons counted is set to a wrong value.  e.g. a button
+        mapping of 1 1 1 for a mouse with three buttons would only initialize 1
+        button to the X server.
+    
+        In the future, the user cannot change this button mapping as the server
+        only knows about one button.
+    
+    The user-supplied button map (option ButtonMapping) shouldn't matter when
+    counting the buttons. Only the driver-internal mapping (BTN_0 -> button 1,
+    etc.) matters.
+    
+    X.Org Bug 23405 <http://bugs.freedesktop.org/show_bug.cgi?id=23405>
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit f4ba2bd785b25fd522967abd7775925d5fded70f
+Author: Dima Kogan <dkogan@secretsauce.net>
+Date:   Sun Aug 16 23:11:50 2009 -0700
+
+    Allow 0 as wheel emulation button for unconditional scrolling (#20529)
+    
+    If wheel emulation is on and the emulation button is 0, then any x/y motion
+    of the device is converted into wheel events. The devices becomes a
+    scrolling-only device.
+    
+    Signed-off-by: Dima Kogan <dkogan@cds.caltech.edu>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 2e5f68754fd5bc4e6b7fa5b95bdd30e2bb4e57fb
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Mon Aug 17 09:41:11 2009 +1000
+
+    Restrict wheel emulation to a single axis at a time.
+    
+    Wheel emulation works for both horizontal and vertical axes. Thus, if a
+    device doesn't move in perfect straight line, scroll events build up on the
+    respective other axis.
+    
+    In some clients, scroll wheel events have specific meanings other than
+    scrolling (e.g. mplayer). In these clients, erroneous scrolling events come
+    at a high cost.
+    
+    Thus, if a scroll wheel event is generated for one axis, reset the inertia
+    of the other axis to 0, avoiding the buildup of these erroneous scrolling
+    events.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 8fdb2abb6fe0426cbbfeead2c187092a56792557
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Aug 14 12:59:27 2009 +1000
+
+    man: fix documentation for EVDEV_PROP_WHEEL_BUTTON
+    
+    0 doesn't disable it, it's still treated like a button number. copy/paste
+    error.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit ca0fb396f1a4b87be9f8aa7ad066e0b469c9075d
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Aug 14 11:00:12 2009 +1000
+
+    evdev 2.2.99.1
+
+commit 7967677789e3ee24733b3514e1ae7a8e12bbc2b5
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Aug 14 09:05:40 2009 +1000
+
+    Treat tablets (BTN_TOOL_PEN devices) differently from touchpads.
+    
+    The previous checks for BTN_TOOL_FINGER and BTN_TOUCH reported false
+    positives for touchpads for most popular tablets.
+    As a result, their events were converted to relative events.
+    
+    Add a new flag EVDEV_TABLET pending presence of BTN_TOOL_PEN and ignore the
+    touchpad special casing to report the events as-is.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 36064dca9097df896b4b1b49c9c68775f1728846
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu Aug 13 10:27:16 2009 +1000
+
+    Add EvdevPostButtonEvent API to immediately post a button event (#23269)
+    
+    The wheel emulation code needs this API. When the timer expires, the event
+    must be posted immediately, not enqueued onto the internal event queue.
+    Otherwise, the emulated middle button press is enqueued only and no event is
+    sent until the next physical event (and its EV_SYN) arrives.
+    
+    Since the timer is triggered outside of the SIGIO and SIGIO is blocked
+    during this period anyway, we could also just enqueue the event and flush by
+    simulating an EV_SYN. It's easier this way though.
+    
+    X.Org Bug 23269 <http://bugs.freedesktop.org/show_bug.cgi?id=23269>
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Acked-by: Oliver McFadden <oliver.mcfadden@nokia.com>
+
+commit 8bf93709cbcf9f041cd177e929ff46adce8a6b79
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu Aug 13 10:16:18 2009 +1000
+
+    Rename parts of the Post API to a Queue API.
+    
+    Button and key events aren't posted from EvdevPost*Event, they are simply
+    enqueued onto the evdev-internal event queue until the next EV_SYN arrives.
+    Rename those interfaces from EvdevPost* to EvdevQueue* and leave only those
+    that actually post to the server with a matching "*Post*" name.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Acked-by: Oliver McFadden <oliver.mcfadden@nokia.com>
+
+commit 37373a223b2aeef7041c9c0bb99be613789a3125
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu Aug 13 10:26:33 2009 +1000
+
+    comment typo fix
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit d764dded18c47cec009babc075f2324cba1781ce
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed Aug 5 18:57:30 2009 +1000
+
+    Skip check for EVDEV_RELATIVE_EVENTS for wheel events.
+    
+    This patch fixes a regression introduced with 1f641d75e.
+    Wheel axis events are posted as button clicks, a device may have no relative
+    axes but it does need to post these button clicks.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit f352598e45be86f9e24d9dba88c657f03f3b168e
+Author: Michael Witten <mfwitten@gmail.com>
+Date:   Tue Aug 4 03:11:49 2009 -0500
+
+    evdev.c: Fix/improve discrimination of rel/abs axes
+    
+    The relevant comment from evdev.c:
+    
+    We don't allow relative and absolute axes on the same device. The
+    reason is that some devices (MS Optical Desktop 2000) register both
+    rel and abs axes for x/y.
+    
+    The abs axes register min/max; this min/max then also applies to the
+    relative device (the mouse) and caps it at 0..255 for both axes.
+    So, unless you have a small screen, you won't be enjoying it much;
+    consequently, absolute axes are generally ignored.
+    
+    However, currenly only a device with absolute axes can be registered
+    as a touch{pad,screen}. Thus, given such a device, absolute axes are
+    used and relative axes are ignored.
+    
+    The code for initializing abs/rel axes has been abstracted out into
+    3 functions, so that initialization in EvdevInit(device) is as easy
+    as:
+    
+        if (pEvdev->flags & (EVDEV_TOUCHPAD | EVDEV_TOUCHSCREEN))
+            EvdevInitTouchDevice(device, pEvdev);
+        else if (pEvdev->flags & EVDEV_RELATIVE_EVENTS)
+            EvdevInitRelClass(device, pEvdev);
+        else if (pEvdev->flags & EVDEV_ABSOLUTE_EVENTS)
+            EvdevInitAbsClass(device, pEvdev);
+    
+    Signed-off-by: Michael Witten <mfwitten@gmail.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 69d6ff3e01263ce2d52ed18b08f054bf3fdb923c
+Author: Oliver McFadden <oliver.mcfadden@nokia.com>
+Date:   Sun Aug 2 12:03:04 2009 +0300
+
+    evdev: Use the EvdevPost...Event() functions in the emulation code.
+    
+    This is similar to commit 1f641d75edba7394201c1c53938215bae696791b.
+    
+    It provides the same functionality of queuing the (in this case
+    emulated) events and waiting until an EV_SYN synchronization event is
+    received before posting them to the server.
+    
+    This preserves the order of events (both real and emulated) and ensures
+    that MotionNotify events will always be posted first. It also unifies
+    the event posting into a few small functions which improves
+    maintainability.
+    
+    From this point on, you should never use the xf86Post...Event()
+    functions in new code, but rather the EvdevPost...Event() versions.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 6f4634111a83808bc52e7e53733cf2d3bab0cccd
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu Jul 30 09:27:27 2009 +1000
+
+    Evdev doesn't require inputproto.
+    
+    None of the inputproto headers seem to be included anywhere.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 1f641d75edba7394201c1c53938215bae696791b
+Author: Oliver McFadden <oliver.mcfadden@nokia.com>
+Date:   Thu Jul 23 13:19:49 2009 +0300
+
+    evdev: Only send the events at synchronization time.
+    
+    Instead of just posting the button/key press/release events to the
+    server as soon as they arrive, add them to an internal queue and post
+    them once we receive an EV_SYN synchronization event.
+    
+    The motion events are always sent first, followed by the queued events.
+    There will be one motion event and possibly many queued button/key
+    events posted every EV_SYN event.
+    
+    Note that the size of the event queue (EVDEV_MAXQUEUE) is arbitrary and
+    you may change it. If we receive more events than the queue can handle,
+    those events are dropped and a warning message printed.
+    
+    Tested on my Lenovo T400 using evdev for all input devices; keyboard,
+    touchpad, and trackpoint.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 2994825665790dc8e35b2944e0d411f3cc9f76fd
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Mon Jul 20 14:52:34 2009 +1000
+
+    Don't register middle mouse button emulation handlers for keyboards.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 9bfd9e8a3683f14860149ae9f842e88828cc0960
+Author: Oliver McFadden <oliver.mcfadden@nokia.com>
+Date:   Thu Jul 16 18:25:37 2009 +0300
+
+    Coverity Prevent: NO_EFFECT in EvdevWheelEmuSetProperty:
+    
+    Event unsigned_compare: Comparing unsigned less than zero is never true. "pEvdev->emulateWheel.timeout < 0UL"
+    342  	            if (pEvdev->emulateWheel.timeout < 0)
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit dcca28a59ce0a2f8a06c559eed493ca43afc20cb
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed Apr 29 18:29:58 2009 +1000
+
+    Count REL_DIAL as a scrollwheel during EvdevProbe (#21457)
+    
+    The Griffin Powermate only has a single axis (REL_DIAL). This axis is
+    posted as horizontal scroll wheel, so we need to ensure the scroll wheel
+    setup (including ensuring that enough buttons are available) is triggered
+    accordingly.
+    
+    X.Org Bug 21457 <http://bugs.freedesktop.org/show_bug.cgi?id=21457>
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit db8b1ca5cffbc48f7d9c5c166489c714ac92ea86
+Author: Asbjørn Sannes <ace@sannes.org>
+Date:   Wed Jul 1 09:51:12 2009 +0200
+
+    evdev: Fix spelling of property in man page to match source code. #22571
+    
+    Signed-off-by: Asbjï¿½rn Sannes <ace@sannes.org>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 8cc0d0f285261b0f26d22b5b4eca9ccbd1beeb93
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Jun 26 09:59:04 2009 +1000
+
+    Fix absolute axis labelling - mapping must be initialized before the labels.
+    
+    88eedea281a710008a82f1e6af4bdffd19477f46 added axis labelling to the
+    valuator initialization. This requires the axis mapping to be established
+    before the absolute axis labels are initialized.
+    
+    88eedea did this for relative axes, but missed out on the absolute ones. As
+    a result, all abs. labels were initialized to "None".
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit aa1609285dfa51570f74671a9f4240bccc1516c2
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Jun 26 09:42:36 2009 +1000
+
+    Message "found absolute touchpad" also applies to tablets - fix.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit b07ab6ea97b779b26e7ae8326528c262cc9907a1
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Jun 26 09:37:29 2009 +1000
+
+    If a device fails to initialize relative axes, init the abs. axes instead.
+    
+    Some devices have relative axes that don't count (scroll wheels). In this
+    case, don't claim we've initialized relative axes, continue with the
+    absolute axes instead.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 7bc48c666d702e649dc529b5d928b6a8549514c3
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue Jun 23 15:43:16 2009 +1000
+
+    Fix wrong axis label index causing OOB reads/writes.
+    
+    The atoms array is filled with each axis atom in mapping order (i.e. after
+    the driver mapping has been applied). 'axis' OTOH is from 0 to ABS_MAX.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 880ad1e19afd83ac115948b67d4049e16cb12df0
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue Jun 23 14:48:17 2009 +1000
+
+    Initialize the axis labels to 0, not "misc".
+    
+    If we don't know what an axis label is, then don't initialize it. None is a
+    valid label.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 6ab23e4519ed4ce07b745c573ddf544a2a1ee1b2
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu Jun 18 16:15:16 2009 +1000
+
+    Add missing checks for ABI_XINPUT_VERSION 7.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 88eedea281a710008a82f1e6af4bdffd19477f46
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu Jun 18 15:33:33 2009 +1000
+
+    Cope with ABI_XINPUT_VERSION 7 - requires button + axes labels.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 9a5a4fed3acae87c89694a9ef8bf905ca0d6a6dd
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu Jun 18 15:15:57 2009 +1000
+
+    Split axes and button labels into separate function.
+    
+    We'll re-use this bit very soon.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 0a3657d2ee62f4086e9687218cb33835ba61a0b3
+Author: Derek Upham <sand@blarg.net>
+Date:   Thu May 21 00:15:28 2009 -0700
+
+    evdev: Prevent driver from processing motion events that it has not configured. #21832
+    
+    The current implementation initializes itself to support relative
+    motion events, or absolute motion events, or neither.  But the
+    event-handling code attempts to process all events, no matter what the
+    initialization was.  This patch reproduces the flag tests found during
+    init, to skip events that the driver doesn't support.
+    
+    Signed-off-by: Derek Upham <sand@blarg.net>
+    Signed-off-by: Julien Cristau <jcristau@debian.org>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit dc2191285e799be891787e1f64d10c1cba271240
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu May 21 13:30:10 2009 +1000
+
+    Deal with BTN_3 to BTN_9 buttons.
+    
+    These buttons were previously mapped to 0, i.e. inactive. This patch
+    slightly improves things in that the buttons are now mapped to 8+.
+    
+    Devices that have both BTN_3 and BTN_SIDE (or a similar pair in that
+    sequence) have both mapped to the same button number though.
+    Devices that have BTN_LEFT, BTN_0, BTN_3 and BTN_SIDE have the last three
+    mapped to 8 (and their followers have double-mappings too). We'll fix that
+    once we actually see devices affected by this.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 255b9f6bbf374a315750019c6fadc5f82fb7d41d
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu May 21 10:23:37 2009 +1000
+
+    Only initialize the number of buttons we actually have.
+    
+    This takes into account driver-configured button mappings, i.e. if device
+    with one button has this button mapped to 25 through the ButtonMapping
+    option, the X server will think the device has result 25 buttons.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit aa117d49a5139bcc453e6ab022b67347464a8acd
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu May 21 09:51:57 2009 +1000
+
+    Rename pEvdev->buttons to pEvdev->num_buttons for clarity.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit b358f1eb3a4ef8fdee099114d6c70d6ea06eba95
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed May 20 11:57:01 2009 +1000
+
+    Ensure enough buttons are advertised to pass the button mapping.
+    
+    Some buttons are mapped to higher button numbers. For example, BTN_0 is
+    posted as button 8 if BTN_LEFT is present. On top of that, the
+    driver-specific button mapping may map the button to something else again.
+    We need to take these mappings into account when counting the number of
+    buttons on the device.
+    
+    Example: A device with BTN_LEFT and BTN_0 and a mapping from 1 -> 7 and 8 ->
+    2.
+    
+    BTN_LEFT is mapped to 1. 1 is mapped to 7. num_buttons is 7.
+    BTN_0 is mapped to 8. 8 is mapped to 2. num_buttons remains 7.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 33cc112ca1af377a85cfeb05dfb72f07d3850a95
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed May 20 11:47:37 2009 +1000
+
+    Up the number of button labels atoms to EVDEV_MAXBUTTONS.
+    
+    Button labels would smash memory if the device had less than 4 buttons and
+    did not advertise a wheel event. In this case the hard-coded wheel button
+    labels would write past the atoms[] boundary.
+    
+    Potential memory smash if a device had a BTN_LEFT and BTN_0, since the
+    latter would map to 8, regardless of the the number of actual buttons
+    (same with BTN_MIDDLE and BTN_1 or BTN_RIGHT and BTN_2).
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 3c43d880f13725a04fcd7c0c8d5978a36208e373
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed May 20 11:42:35 2009 +1000
+
+    Only label axes and buttons if the device has axes or buttons.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 54628989356793828fcbb5f62a091b962c7da4f9
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed May 13 12:51:52 2009 +1000
+
+    Use xf86DisableDevice instead of the DIX' DisableDevice.
+    
+    DisableDevice has changed API in xi2, xf86DisableDevice hasn't. So let's use
+    this one so we can have one version for master and xi2.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 9243d338d1de7df8afb1e254590cd4bf84888c7e
+Author: Dan Nicholson <dbn.lists@gmail.com>
+Date:   Sun May 10 08:29:21 2009 -0700
+
+    Fix copy-paste error when probing type name
+    
+    A minor copy and paste error was introduced in 71e9a69e leaving an "if"
+    where an "else if" should be. Without this, any device configured as
+    XI_TOUCHPAD or XI_TABLET will end up having the type_name reset to
+    either XI_TOUCHSCREEN or XI_MOUSE.
+    
+    Signed-off-by: Dan Nicholson <dbn.lists@gmail.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 71e9a69ed68257e5ded26c062a9797de571bb880
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed Apr 29 18:03:18 2009 +1000
+
+    Revamp the whole "has_axes" definition.
+    
+    Since we can now deal with multiple axes, etc. we might as well print it
+    properly.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 220e2dfb8f6aa08bd5f59e81c6883c057b945721
 Author: Peter Hutterer <peter.hutterer@who-t.net>
 Date:   Thu Apr 16 13:23:50 2009 +1000
 
@@ -15,18 +713,16 @@ Date:   Thu Apr 16 13:23:50 2009 +1000
     signal handler.
     
     Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
-    (cherry picked from commit 220e2dfb8f6aa08bd5f59e81c6883c057b945721)
 
-commit 48a747ea8603ece6bd25ba5b1ce92c2eb91a7c01
+commit ddc126637404cb3d9356b7698779dcd8849f8718
 Author: Peter Hutterer <peter.hutterer@who-t.net>
 Date:   Thu Apr 16 12:01:03 2009 +1000
 
     Pre-allocate the reopen timer so we don't allocate during sigio handling.
     
     Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
-    (cherry picked from commit ddc126637404cb3d9356b7698779dcd8849f8718)
 
-commit aa58eb609617beb5d3199dab262f96003f57ab97
+commit 98ecb5233bb3b899bd696a90d2733c6a345676dd
 Author: Peter Hutterer <peter.hutterer@who-t.net>
 Date:   Mon Apr 6 10:22:25 2009 +1000
 
@@ -36,15 +732,28 @@ Date:   Mon Apr 6 10:22:25 2009 +1000
     
     Reported-by: David Woodhouse <dwmw2@infradead.org>
     Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
-    (cherry picked from commit 98ecb5233bb3b899bd696a90d2733c6a345676dd)
 
-commit aff7228d972eedd556b13f06d8db0b5ffb622b46
+commit 92ca3dc2e759759545c0e0adea4277b3bddb05e5
 Author: Peter Hutterer <peter.hutterer@who-t.net>
-Date:   Tue Mar 24 15:13:23 2009 +1000
+Date:   Thu Mar 26 13:40:07 2009 +1000
 
-    evdev 2.2.1
+    Fix wrong reference to axis and button label atom list.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
 
-commit c695234c5c5fd54a6afd12db46a0926ccdd83301
+commit 3fa28c8acd3aad054f9c74e94c1411654d709dca
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu Mar 26 10:11:26 2009 +1000
+
+    Remove test/ directory.
+    
+    This shouldn't really be part of the driver source, it's better to just have
+    it as a separate repository. Code has moved to
+    git://people.freedesktop.org/~whot/testdevices.git
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit d9809d7edd2be714a15115b990286554e2979fb6
 Author: Peter Hutterer <peter.hutterer@who-t.net>
 Date:   Tue Mar 17 14:08:29 2009 +1000
 
@@ -57,18 +766,16 @@ Date:   Tue Mar 17 14:08:29 2009 +1000
     were actually reported.
     
     Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
-    (cherry picked from commit d9809d7edd2be714a15115b990286554e2979fb6)
 
-commit 79d4956add44d1150e835cbb0d44d3d1c9077203
+commit b11439a1763b5f210460b492dd4f47e973f90a3a
 Author: Peter Hutterer <peter.hutterer@who-t.net>
 Date:   Tue Mar 17 13:25:58 2009 +1000
 
     If we have a touchpad, print so, don't claim we're configuring a tablet.
     
     Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
-    (cherry picked from commit b11439a1763b5f210460b492dd4f47e973f90a3a)
 
-commit 7e9809837c41a9ad0822a9bbc59362a3ba666696
+commit 740dc202f735106532dce581deabe2b95c52759f
 Author: Jeremy Jay <dinkumator@gmail.com>
 Date:   Mon Mar 16 23:19:54 2009 -0400
 
@@ -78,9 +785,8 @@ Date:   Mon Mar 16 23:19:54 2009 -0400
     
     Signed-off-by: Jeremy Jay <dinkumator@gmail.com>
     Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
-    (cherry picked from commit 740dc202f735106532dce581deabe2b95c52759f)
 
-commit d07692a4af507504b2d3c5a2172b8b23a4d7e2f4
+commit 7ac0c4456dc0846f7e09f334a26f9536e20065df
 Author: Peter Hutterer <peter.hutterer@who-t.net>
 Date:   Tue Mar 17 08:02:00 2009 +1000
 
@@ -90,9 +796,16 @@ Date:   Tue Mar 17 08:02:00 2009 +1000
     Touchscreens have either pressure or touch, but no finger.
     
     Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
-    (cherry picked from commit 7ac0c4456dc0846f7e09f334a26f9536e20065df)
 
-commit 1073cd4fdca2152898d9e27d7d237452a37d9f81
+commit b4f6ab126dfc897759559aae7ae32fbc0efe24d8
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Mar 13 13:40:16 2009 +1000
+
+    Move keymap/modifier initialization behind the ABI < 5 ifdefs.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit a3ea979c2b70d166d62422b4ba450ce2910389c3
 Author: Jeremy Jay <dinkumator@gmail.com>
 Date:   Mon Mar 16 08:36:53 2009 +1000
 
@@ -104,9 +817,8 @@ Date:   Mon Mar 16 08:36:53 2009 +1000
     X.Org Bug 20661 <http://bugs.freedesktop.org/show_bug.cgi?id=20661>
     
     Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
-    (cherry picked from commit a3ea979c2b70d166d62422b4ba450ce2910389c3)
 
-commit 486bbdc481a6eb337b57a7b85a99267cf2879aae
+commit a7fb654a68a26ad5f019a902312c6b94dbe9c3ea
 Author: Peter Hutterer <peter.hutterer@who-t.net>
 Date:   Tue Mar 10 15:17:53 2009 +1000
 
@@ -118,13 +830,12 @@ Date:   Tue Mar 10 15:17:53 2009 +1000
     
     Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
     Tested-by: Marty Jack <martyj19@comcast.net>
-    (cherry picked from commit a7fb654a68a26ad5f019a902312c6b94dbe9c3ea)
 
-commit 73e5eba8cd9ef885542c94b72b783366228ce0df
+commit 3f06825a446e317485c2e2d1880c1886684d8742
 Author: Peter Hutterer <peter.hutterer@who-t.net>
-Date:   Mon Mar 9 09:27:19 2009 +1000
+Date:   Mon Mar 9 09:26:51 2009 +1000
 
-    evdev 2.2.0
+    Bump to 2.2.99.
     
     Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
 

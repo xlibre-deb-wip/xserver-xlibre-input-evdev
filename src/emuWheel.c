@@ -54,7 +54,7 @@ static Atom prop_wheel_button   = 0;
 
 /* Local Funciton Prototypes */
 static BOOL EvdevWheelEmuHandleButtonMap(InputInfoPtr pInfo, WheelAxisPtr pAxis, char *axis_name);
-static void EvdevWheelEmuInertia(InputInfoPtr pInfo, WheelAxisPtr axis, int value);
+static int EvdevWheelEmuInertia(InputInfoPtr pInfo, WheelAxisPtr axis, int value);
 
 /* Filter mouse button events */
 BOOL
@@ -82,8 +82,7 @@ EvdevWheelEmuFilterButton(InputInfoPtr pInfo, unsigned int button, int value)
                  * If the button is released early enough emit the button
                  * press/release events
                  */
-                xf86PostButtonEvent(pInfo->dev, 0, button, 1, 0, 0);
-                xf86PostButtonEvent(pInfo->dev, 0, button, 0, 0, 0);
+                EvdevQueueButtonClicks(pInfo, button, 1);
             }
         }
 
@@ -99,38 +98,51 @@ BOOL
 EvdevWheelEmuFilterMotion(InputInfoPtr pInfo, struct input_event *pEv)
 {
     EvdevPtr pEvdev = (EvdevPtr)pInfo->private;
-    WheelAxisPtr pAxis = NULL;
+    WheelAxisPtr pAxis = NULL, pOtherAxis = NULL;
     int value = pEv->value;
-    int ms;
 
     /* Has wheel emulation been configured to be enabled? */
     if (!pEvdev->emulateWheel.enabled)
 	return FALSE;
 
-    /* Handle our motion events if the emuWheel button is pressed*/
-    if (pEvdev->emulateWheel.button_state) {
+    /* Handle our motion events if the emuWheel button is pressed
+     * wheel button of 0 means always emulate wheel.
+     */
+    if (pEvdev->emulateWheel.button_state || !pEvdev->emulateWheel.button) {
         /* Just return if the timeout hasn't expired yet */
-        ms = pEvdev->emulateWheel.expires - GetTimeInMillis();
-        if (ms > 0)
-            return TRUE;
+        if (pEvdev->emulateWheel.button)
+        {
+            int ms = pEvdev->emulateWheel.expires - GetTimeInMillis();
+            if (ms > 0)
+                return TRUE;
+        }
 
 	/* We don't want to intercept real mouse wheel events */
 	switch(pEv->code) {
 	case REL_X:
 	    pAxis = &(pEvdev->emulateWheel.X);
+	    pOtherAxis = &(pEvdev->emulateWheel.Y);
 	    break;
 
 	case REL_Y:
 	    pAxis = &(pEvdev->emulateWheel.Y);
+	    pOtherAxis = &(pEvdev->emulateWheel.X);
 	    break;
 
 	default:
 	    break;
 	}
 
-	/* If we found REL_X or REL_Y, emulate a mouse wheel */
+	/* If we found REL_X or REL_Y, emulate a mouse wheel.
+           Reset the inertia of the other axis when a scroll event was sent
+           to avoid the buildup of erroneous scroll events if the user
+           doesn't move in a perfectly straight line.
+         */
 	if (pAxis)
-	    EvdevWheelEmuInertia(pInfo, pAxis, value);
+	{
+	    if (EvdevWheelEmuInertia(pInfo, pAxis, value))
+		pOtherAxis->traveled_distance = 0;
+	}
 
 	/* Eat motion events while emulateWheel button pressed. */
 	return TRUE;
@@ -139,17 +151,20 @@ EvdevWheelEmuFilterMotion(InputInfoPtr pInfo, struct input_event *pEv)
     return FALSE;
 }
 
-/* Simulate inertia for our emulated mouse wheel */
-static void
+/* Simulate inertia for our emulated mouse wheel.
+   Returns the number of wheel events generated.
+ */
+static int
 EvdevWheelEmuInertia(InputInfoPtr pInfo, WheelAxisPtr axis, int value)
 {
     EvdevPtr pEvdev = (EvdevPtr)pInfo->private;
     int button;
     int inertia;
+    int rc = 0;
 
     /* if this axis has not been configured, just eat the motion */
     if (!axis->up_button)
-	return;
+	return rc;
 
     axis->traveled_distance += value;
 
@@ -163,11 +178,11 @@ EvdevWheelEmuInertia(InputInfoPtr pInfo, WheelAxisPtr axis, int value)
 
     /* Produce button press events for wheel motion */
     while(abs(axis->traveled_distance) > pEvdev->emulateWheel.inertia) {
-
 	axis->traveled_distance -= inertia;
-	xf86PostButtonEvent(pInfo->dev, 0, button, 1, 0, 0);
-	xf86PostButtonEvent(pInfo->dev, 0, button, 0, 0, 0);
+	EvdevQueueButtonClicks(pInfo, button, 1);
+	rc++;
     }
+    return rc;
 }
 
 /* Handle button mapping here to avoid code duplication,
@@ -201,8 +216,8 @@ EvdevWheelEmuHandleButtonMap(InputInfoPtr pInfo, WheelAxisPtr pAxis, char* axis_
 	    pAxis->down_button = down_button;
 
 	    /* Update the number of buttons if needed */
-	    if (up_button > pEvdev->buttons) pEvdev->buttons = up_button;
-	    if (down_button > pEvdev->buttons) pEvdev->buttons = down_button;
+	    if (up_button > pEvdev->num_buttons) pEvdev->num_buttons = up_button;
+	    if (down_button > pEvdev->num_buttons) pEvdev->num_buttons = down_button;
 
 	} else {
 	    xf86Msg(X_WARNING, "%s: Invalid %s value:\"%s\"\n",
@@ -285,8 +300,8 @@ EvdevWheelEmuPreInit(InputInfoPtr pInfo)
 
         /* Simpler to check just the largest value in this case */
         /* XXX: we should post this to the server */
-        if (5 > pEvdev->buttons)
-            pEvdev->buttons = 5;
+        if (5 > pEvdev->num_buttons)
+            pEvdev->num_buttons = 5;
 
         /* Display default Configuration */
         xf86Msg(X_CONFIG, "%s: YAxisMapping: buttons %d and %d\n",
@@ -336,15 +351,6 @@ EvdevWheelEmuSetProperty(DeviceIntPtr dev, Atom atom, XIPropertyValuePtr val,
                     XIChangeDeviceProperty(dev, prop_wheel_inertia, XA_INTEGER,
                             16, PropModeReplace, 1,
                             &pEvdev->emulateWheel.inertia, TRUE);
-            }
-
-            /* Don't enable with negative timeout */
-            if (pEvdev->emulateWheel.timeout < 0)
-            {
-                pEvdev->emulateWheel.timeout = 200;
-                XIChangeDeviceProperty(dev, prop_wheel_timeout, XA_INTEGER, 16,
-                        PropModeReplace, 1,
-                        &pEvdev->emulateWheel.timeout, TRUE);
             }
         }
     }

@@ -22,7 +22,7 @@
 
 AC_PREREQ(2.57)
 AC_INIT([xf86-input-evdev],
-        2.2.2,
+        2.3.1,
         [https://bugs.freedesktop.org/enter_bug.cgi?product=xorg],
         xf86-input-evdev)
 
@@ -32,16 +32,16 @@ AM_INIT_AUTOMAKE([dist-bzip2])
 
 AM_MAINTAINER_MODE
 
-# Require xorg-macros: XORG_CWARNFLAGS, XORG_CHANGELOG
-m4_ifndef([XORG_MACROS_VERSION], [AC_FATAL([must install xorg-macros 1.2 or later before running autoconf/autogen])])
-XORG_MACROS_VERSION(1.2)
+# Require xorg-macros: XORG_DEFAULT_OPTIONS
+m4_ifndef([XORG_MACROS_VERSION], [AC_FATAL([must install xorg-macros 1.3 or later before running autoconf/autogen])])
+XORG_MACROS_VERSION(1.3)
 AM_CONFIG_HEADER([config.h])
 
 # Checks for programs.
 AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
 AC_PROG_CC
-XORG_CWARNFLAGS
+XORG_DEFAULT_OPTIONS
 
 AH_TOP([#include "xorg-server.h"])
 
@@ -52,24 +52,6 @@ AC_ARG_WITH(xorg-module-dir,
             [moduledir="$libdir/xorg/modules"])
 inputdir=${moduledir}/input
 AC_SUBST(inputdir)
-
-# Enable building everything in the test/ directory. These are uinput-based
-# devices that resemble random hardware that may or may not look like a mouse,
-# keyboard, etc.
-AC_ARG_ENABLE(testdevices,
-              AC_HELP_STRING([--enable-testdevices], [Build uinput-based test devices]),
-              [BUILD_TEST="yes"],
-              [BUILD_TEST="no"])
-AM_CONDITIONAL([BUILD_TEST], [test "x$BUILD_TEST" = "xyes"])
-
-if test "x$BUILD_TEST" = "xyes"; then
-    AC_CHECK_FUNC([dlopen], [],
-                  AC_CHECK_LIB([dl], [dlopen], DLOPEN_LIBS="-ldl"))
-    AC_SUBST([DLOPEN_LIBS])
-fi
-
-# Checks for extensions
-XORG_DRIVER_CHECK_EXT(XINPUT, inputproto)
 
 # Checks for pkg-config packages. We need to be able to override sdkdir
 # to satisfy silly distcheck requirements.
@@ -88,13 +70,8 @@ AC_HEADER_STDC
 DRIVER_NAME=evdev
 AC_SUBST([DRIVER_NAME])
 
-XORG_MANPAGE_SECTIONS
-XORG_RELEASE_VERSION
-XORG_CHANGELOG
-
 AC_OUTPUT([Makefile
            src/Makefile
            man/Makefile
            include/Makefile
-           test/Makefile
            xorg-evdev.pc])

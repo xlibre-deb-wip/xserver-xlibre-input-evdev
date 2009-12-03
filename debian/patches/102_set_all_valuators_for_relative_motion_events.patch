@@ -1,0 +1,18 @@
+#
+# Upstream: http://cgit.freedesktop.org/xorg/driver/xf86-input-evdev/commit/?id=c1f16a4f59a584ab4546c2f16e20b06703042057
+# Modified to apply on 2.2.5
+#
+
+Index: xserver-xorg-input-evdev-2.2.5/src/evdev.c
+===================================================================
+--- xserver-xorg-input-evdev-2.2.5.orig/src/evdev.c	2009-11-23 23:10:34.000000000 +0100
++++ xserver-xorg-input-evdev-2.2.5/src/evdev.c	2009-11-23 23:12:37.000000000 +0100
+@@ -493,7 +493,7 @@
+                 for (i = 0; i < REL_CNT; i++)
+                 {
+                     int map = pEvdev->axis_map[i];
+-                    if (delta[i] && map != -1)
++                    if (map != -1)
+                     {
+                         post_deltas[map] = delta[i];
+                         if (map < first)

@@ -1,3 +1,10 @@
+xserver-xorg-input-evdev (1:2.3.2-3ubuntu1) lucid; urgency=low
+
+  * Add 100-silence-eviocgname-error.patch:
+     - Silences the harmless EVIOCGNAME errors from the log.
+
+ -- Robert Hooker <sarvatt@ubuntu.com>  Tue, 23 Feb 2010 23:28:05 -0500
+
 xserver-xorg-input-evdev (1:2.3.2-3) unstable; urgency=low
 
   * 65-xorg-evdev.rules: instead of blacklisting joysticks, explicitly

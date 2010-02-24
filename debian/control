@@ -8,7 +8,7 @@ Build-Depends:
  debhelper (>= 5.0.0),
  pkg-config,
  quilt,
- xserver-xorg-dev (>= 2:1.6.99.900),
+ xserver-xorg-dev (>= 2:1.7),
  x11proto-core-dev,
  x11proto-randr-dev,
  x11proto-input-dev,
@@ -24,13 +24,30 @@ Vcs-Browser: http://git.debian.org/?p=pkg-xorg/driver/xserver-xorg-input-evdev.g
 
 Package: xserver-xorg-input-evdev
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, ${xserver:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${xserver:Depends},
+ udev [linux-any],
 Provides: ${xinpdriver:Provides}
 Replaces: xserver-xorg (<< 6.8.2-35)
 Description: X.Org X server -- evdev input driver
  This package provides the driver for input devices using evdev, the Linux
  kernel's event delivery mechanism.  This driver allows for multiple keyboards
  and mice to be treated as separate input devices.
+ .
+ More information about X.Org can be found at:
+ <URL:http://www.X.org>
+ <URL:http://xorg.freedesktop.org>
+ <URL:http://lists.freedesktop.org/mailman/listinfo/xorg>
+ .
+ This package is built from the X.org xf86-input-evdev driver module.
+
+Package: xserver-xorg-input-evdev-dev
+Section: libdevel
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: X.Org X server -- evdev input driver (development headers)
+ This package provides the development headers for the evdev input driver
+ found in xserver-xorg-input-evdev. Non-developers likely have little use
+ for this package.
  .
  More information about X.Org can be found at:
  <URL:http://www.X.org>

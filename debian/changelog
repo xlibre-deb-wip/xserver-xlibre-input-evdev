@@ -1,3 +1,39 @@
+xserver-xorg-input-evdev (1:2.3.2-3) unstable; urgency=low
+
+  * 65-xorg-evdev.rules: instead of blacklisting joysticks, explicitly
+    whitelist keyboards, mice, touchscreens and touchpads (closes: #564219).
+    We'll need a better solution, but this should do for now.
+  * No need to test for linux in postinst, this package only exists on linux.
+
+ -- Julien Cristau <jcristau@debian.org>  Tue, 12 Jan 2010 10:36:54 +0000
+
+xserver-xorg-input-evdev (1:2.3.2-2) unstable; urgency=low
+
+  [ Timo Aaltonen ]
+  * evdev.rules: Skip joysticks, since using evdev for those is
+    generally considered as a bad idea. Use -joystick instead.
+
+  [ Julien Cristau ]
+  * evdev.rules: Match on ID_INPUT instead of device name + subsystem.
+  * Upload to unstable.
+
+ -- Julien Cristau <jcristau@debian.org>  Thu, 07 Jan 2010 20:21:57 +0000
+
+xserver-xorg-input-evdev (1:2.3.2-1) experimental; urgency=low
+
+  [ Timo Aaltonen ]
+  * Build against Xserver 1.7.
+  * Run udevadm trigger on postinst, and depend on udev [linux-any].
+  * Add xserver-xorg-input-evdev-dev for the header and .pc files.
+
+  [ Julien Cristau ]
+  * 65-xorg-evdev.rules: don't ignore change events.
+
+  [ Brice Goglin ]
+  * New upstream release.
+
+ -- Brice Goglin <bgoglin@debian.org>  Sat, 12 Dec 2009 17:56:22 +0100
+
 xserver-xorg-input-evdev (1:2.3.1-1) experimental; urgency=low
 
   * New upstream release.

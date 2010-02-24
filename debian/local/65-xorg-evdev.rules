@@ -1,9 +1,12 @@
-ACTION!="add", GOTO="xorg_evdev_end"
-SUBSYSTEM!="input", GOTO="xorg_evdev_end"
-KERNEL!="event*", GOTO="xorg_evdev_end"
+ACTION!="add|change", GOTO="xorg_evdev_end"
 
-# By default, we use the -evdev driver for every input device; later rules can
-# then change the driver for specific input devices.
-ENV{x11_driver}="evdev"
+# By default, we use the -evdev driver for every mouse, keyboard, touchscreen
+# or touchpad; later rules can then change the driver for specific input
+# devices.
+ENV{ID_INPUT}=="", GOTO="xorg_evdev_end"
+ENV{ID_INPUT_MOUSE}=="?*", ENV{x11_driver}="evdev"
+ENV{ID_INPUT_KEY}=="?*", ENV{x11_driver}="evdev"
+ENV{ID_INPUT_TOUCHSCREEN}=="?*", ENV{x11_driver}="evdev"
+ENV{ID_INPUT_TOUCHPAD}=="?*", ENV{x11_driver}="evdev"
 
 LABEL="xorg_evdev_end"

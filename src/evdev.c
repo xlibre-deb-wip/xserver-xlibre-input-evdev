@@ -464,6 +464,13 @@ EvdevProcessValuators(InputInfoPtr pInfo, int v[MAX_VALUATORS], int *num_v,
      */
     else if (pEvdev->abs && pEvdev->tool) {
         memcpy(v, pEvdev->vals, sizeof(int) * pEvdev->num_vals);
+
+        if (pEvdev->swap_axes) {
+            int tmp = v[0];
+            v[0] = v[1];
+            v[1] = tmp;
+        }
+
         if (pEvdev->flags & EVDEV_CALIBRATED)
         {
             v[0] = xf86ScaleAxis(v[0],
@@ -474,12 +481,6 @@ EvdevProcessValuators(InputInfoPtr pInfo, int v[MAX_VALUATORS], int *num_v,
                     pEvdev->absinfo[ABS_Y].maximum,
                     pEvdev->absinfo[ABS_Y].minimum,
                     pEvdev->calibration.max_y, pEvdev->calibration.min_y);
-        }
-
-        if (pEvdev->swap_axes) {
-            int tmp = v[0];
-            v[0] = v[1];
-            v[1] = tmp;
         }
 
         if (pEvdev->invert_x)
@@ -616,7 +617,6 @@ EvdevProcessKeyEvent(InputInfoPtr pInfo, struct input_event *ev)
             return;
 
     switch (ev->code) {
-        case BTN_TOUCH:
         case BTN_TOOL_PEN:
         case BTN_TOOL_RUBBER:
         case BTN_TOOL_BRUSH:
@@ -626,7 +626,11 @@ EvdevProcessKeyEvent(InputInfoPtr pInfo, struct input_event *ev)
         case BTN_TOOL_MOUSE:
         case BTN_TOOL_LENS:
             pEvdev->tool = value ? ev->code : 0;
-            if (!(pEvdev->flags & EVDEV_TOUCHSCREEN))
+            break;
+
+        case BTN_TOUCH:
+            pEvdev->tool = value ? ev->code : 0;
+            if (!(pEvdev->flags & (EVDEV_TOUCHSCREEN | EVDEV_TABLET)))
                 break;
             /* Treat BTN_TOUCH from devices that only have BTN_TOUCH as
              * BTN_LEFT. */
@@ -1928,6 +1932,11 @@ EvdevProbe(InputInfoPtr pInfo)
             {
                 xf86Msg(X_INFO, "%s: Found absolute tablet.\n", pInfo->name);
                 pEvdev->flags |= EVDEV_TABLET;
+                if (!pEvdev->num_buttons)
+                {
+                    pEvdev->num_buttons = 7; /* LMR + scroll wheels */
+                    pEvdev->flags |= EVDEV_BUTTON_EVENTS;
+                }
             } else if (TestBit(ABS_PRESSURE, pEvdev->abs_bitmask) ||
                 TestBit(BTN_TOUCH, pEvdev->key_bitmask)) {
                 if (num_buttons || TestBit(BTN_TOOL_FINGER, pEvdev->key_bitmask)) {
@@ -2510,8 +2519,22 @@ EvdevInitProperty(DeviceIntPtr dev)
 
         prop_calibration = MakeAtom(EVDEV_PROP_CALIBRATION,
                 strlen(EVDEV_PROP_CALIBRATION), TRUE);
-        rc = XIChangeDeviceProperty(dev, prop_calibration, XA_INTEGER, 32,
-                PropModeReplace, 0, NULL, FALSE);
+        if (pEvdev->flags & EVDEV_CALIBRATED) {
+            int calibration[4];
+
+            calibration[0] = pEvdev->calibration.min_x;
+            calibration[1] = pEvdev->calibration.max_x;
+            calibration[2] = pEvdev->calibration.min_y;
+            calibration[3] = pEvdev->calibration.max_y;
+
+            rc = XIChangeDeviceProperty(dev, prop_calibration, XA_INTEGER,
+                    32, PropModeReplace, 4, calibration,
+                    FALSE);
+        } else if (pEvdev->flags & EVDEV_ABSOLUTE_EVENTS) {
+            rc = XIChangeDeviceProperty(dev, prop_calibration, XA_INTEGER,
+                    32, PropModeReplace, 0, NULL,
+                    FALSE);
+        }
         if (rc != Success)
             return;
 

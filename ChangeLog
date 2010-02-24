@@ -1,3 +1,73 @@
+commit f7850a40424f7ec0c32fb2b46d427b51b5410d99
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Dec 11 13:42:33 2009 +1000
+
+    evdev 2.3.2
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit bd4102af6e168c1b9129301f88e9601f8f5e0848
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue Dec 1 15:44:39 2009 +1000
+
+    Fix up BTN_TOUCH handling for non-button tablets.
+    
+    BTN_TOOL_* is treated as tool, just like before. BTN_TOUCH on the other hand
+    may need to be treated as a button left press. This again requires a button
+    class.
+    
+    Tested on an HP Touchsmart and a Wacom tablet.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    (cherry picked from commit 1b0df04abe329433658c95debdafdf1714173814)
+
+commit 22e816eb326a5495a5dc6e0a94394534d6645bae
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue Dec 1 14:16:10 2009 +1000
+
+    Only init the calibration property for absolute devices.
+    
+    Relative devices can't be calibrated anyway so why bother.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    (cherry picked from commit 2ca24a16f08095f35d5610f16e202c525b3075e9)
+
+commit b6b377fe9afa51ee8cbef8e9830537806e94a3ac
+Author: David Woodhouse <dwmw2@infradead.org>
+Date:   Tue Dec 1 00:14:54 2009 +0000
+
+    Report initial calibration parameters.
+    
+    Where an initial calibration is provided through the Calibration option
+    to the driver, it wasn't being exposed in the 'Evdev Axis Calibration'
+    property. Remedy that...
+    
+    Signed-off-by: David Woodhouse <David.Woodhouse@intel.com>
+    Acked-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    (cherry picked from commit 7b285a802b8ccddd1edcf40ab345c4a96bcdf43c)
+
+commit 3772676fd65065b43a94234127537ab5030b09f8
+Author: David Woodhouse <dwmw2@infradead.org>
+Date:   Tue Dec 1 00:12:36 2009 +0000
+
+    Swap axes before applying touch screen calibration.
+    
+    When the SwapAxes option is set, the X and Y axes in calibration should
+    be labelled as the user perceives them -- not as the kernel sends them.
+    
+    Currently, we apply the X-axis calibration to the X-axis of the input,
+    and then do the axis swapping so we've actually applied the X-axis
+    calibration to what the user sees as the Y-axis.
+    
+    This patch changes the order of the operations, so that the axes are
+    swapped before the calibration is applied.
+    
+    Signed-off-by: David Woodhouse <David.Woodhouse@intel.com>
+    Acked-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    (cherry picked from commit f187badb71554a73bf9ca30ce75c9d166e688f03)
+
 commit 4f05afd495214ad48ffab7bdb1cde69aacc5af8f
 Author: Peter Hutterer <peter.hutterer@who-t.net>
 Date:   Fri Nov 20 11:18:03 2009 +1000

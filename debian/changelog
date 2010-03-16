@@ -1,3 +1,10 @@
+xserver-xorg-input-evdev (1:2.3.2-3ubuntu2) lucid; urgency=low
+
+  * 65-xorg-evdev.rules: only set x11_driver for event devices, and also
+    extend to work for tablet devices. Fixes part of LP: #537801
+
+ -- Robert Hooker <sarvatt@ubuntu.com>  Mon, 15 Mar 2010 21:05:29 -0400
+
 xserver-xorg-input-evdev (1:2.3.2-3ubuntu1) lucid; urgency=low
 
   * Add 100-silence-eviocgname-error.patch:

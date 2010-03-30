@@ -1,3 +1,30 @@
+xserver-xorg-input-evdev (1:2.3.2-5) UNRELEASED; urgency=low
+
+  * Install 05-evdev.conf in /usr/lib/X11/xorg.conf.d.
+  * Remove 65-xorg-evdev.rules, obsoleted by the above.
+  * Drop the postinst, and don't depend on udev.
+
+ -- Timo Aaltonen <tjaalton@ubuntu.com>  Sun, 21 Mar 2010 20:51:38 +0200
+
+xserver-xorg-input-evdev (1:2.3.2-4) unstable; urgency=low
+
+  [ Julien Cristau ]
+  * Rename the build directory to not include DEB_BUILD_GNU_TYPE for no
+    good reason.  Thanks, Colin Watson!
+  * Remove myself from Uploaders
+  * 65-xorg-evdev.rules: only set x11_driver for event devices.
+
+  [ Robert Hooker ]
+  * Build xserver-xorg-input-evdev-dev on arch: all.
+
+  [ Cyril Brulebois ]
+  * Add udeb needed for the graphical installer:
+    xserver-xorg-input-evdev-udeb.
+  * Bump Standards-Version from 3.8.3 to 3.8.4 (no changes needed).
+  * Add myself to Uploaders.
+
+ -- Cyril Brulebois <kibi@debian.org>  Fri, 12 Mar 2010 01:02:58 +0100
+
 xserver-xorg-input-evdev (1:2.3.2-3ubuntu2) lucid; urgency=low
 
   * 65-xorg-evdev.rules: only set x11_driver for event devices, and also

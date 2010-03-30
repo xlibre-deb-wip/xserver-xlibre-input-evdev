@@ -3,7 +3,7 @@ Section: x11
 Priority: optional
 Maintainer: Ubuntu X-SWAT <ubuntu-x@lists.ubuntu.com>
 XSBC-Original-Maintainer: Debian X Strike Force <debian-x@lists.debian.org>
-Uploaders: David Nusinow <dnusinow@debian.org>, Drew Parsons <dparsons@debian.org>, Julien Cristau <jcristau@debian.org>, Brice Goglin <bgoglin@debian.org>
+Uploaders: David Nusinow <dnusinow@debian.org>, Drew Parsons <dparsons@debian.org>, Brice Goglin <bgoglin@debian.org>, Cyril Brulebois <kibi@debian.org>
 Build-Depends:
  debhelper (>= 5.0.0),
  pkg-config,
@@ -18,14 +18,13 @@ Build-Depends:
  automake,
  libtool,
  xutils-dev (>= 1:7.5~1)
-Standards-Version: 3.8.3
+Standards-Version: 3.8.4
 Vcs-Git: git://git.debian.org/git/pkg-xorg/driver/xserver-xorg-input-evdev
 Vcs-Browser: http://git.debian.org/?p=pkg-xorg/driver/xserver-xorg-input-evdev.git
 
 Package: xserver-xorg-input-evdev
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, ${xserver:Depends},
- udev [linux-any],
 Provides: ${xinpdriver:Provides}
 Replaces: xserver-xorg (<< 6.8.2-35)
 Description: X.Org X server -- evdev input driver
@@ -40,9 +39,19 @@ Description: X.Org X server -- evdev input driver
  .
  This package is built from the X.org xf86-input-evdev driver module.
 
+Package: xserver-xorg-input-evdev-udeb
+XC-Package-Type: udeb
+Section: debian-installer
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${xserver:Depends},
+ udev-udeb [linux-any],
+Provides: ${xinpdriver:Provides}
+Description: X.Org X server -- evdev input driver
+ This is a udeb, or a microdeb, for the debian-installer.
+
 Package: xserver-xorg-input-evdev-dev
 Section: libdevel
-Architecture: any
+Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: X.Org X server -- evdev input driver (development headers)
  This package provides the development headers for the evdev input driver

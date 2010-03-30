@@ -39,15 +39,15 @@ Description: X.Org X server -- evdev input driver
  .
  This package is built from the X.org xf86-input-evdev driver module.
 
-Package: xserver-xorg-input-evdev-udeb
-XC-Package-Type: udeb
-Section: debian-installer
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, ${xserver:Depends},
- udev-udeb [linux-any],
-Provides: ${xinpdriver:Provides}
-Description: X.Org X server -- evdev input driver
- This is a udeb, or a microdeb, for the debian-installer.
+#Package: xserver-xorg-input-evdev-udeb
+#XC-Package-Type: udeb
+#Section: debian-installer
+#Architecture: any
+#Depends: ${shlibs:Depends}, ${misc:Depends}, ${xserver:Depends},
+# udev-udeb [linux-any],
+#Provides: ${xinpdriver:Provides}
+#Description: X.Org X server -- evdev input driver
+# This is a udeb, or a microdeb, for the debian-installer.
 
 Package: xserver-xorg-input-evdev-dev
 Section: libdevel

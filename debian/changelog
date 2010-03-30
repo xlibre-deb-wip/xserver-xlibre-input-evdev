@@ -1,6 +1,7 @@
 xserver-xorg-input-evdev (1:2.3.2-5ubuntu1) UNRELEASED; urgency=low
 
   * Merge from Debian unstable. (LP: #546933)
+  * control, rules: Don't build the udeb.
 
  -- Timo Aaltonen <tjaalton@ubuntu.com>  Tue, 30 Mar 2010 19:20:42 +0300
 

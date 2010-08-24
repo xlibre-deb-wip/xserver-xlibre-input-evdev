@@ -32,6 +32,9 @@ endif
 # kbd_drv.a isn't phenomenally useful; kbd_drv.so more so
 confflags += --disable-static
 
+# enable grail for gesture support
+confflags += --enable-grail
+
 configure: $(STAMP_DIR)/patch
 	autoreconf -vfi
 

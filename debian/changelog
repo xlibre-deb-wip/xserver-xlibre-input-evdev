@@ -1,3 +1,16 @@
+xserver-xorg-input-evdev (1:2.3.2-6ubuntu1) maverick; urgency=low
+
+  * Add gesture support
+    - Add debian/patches/100-fix-touchup-problem-on-touchpads.patch and
+      debian/patches/101-gestures.patch
+    - debian/rules:
+      - add configure option to enable utouch-grail support
+  * Replace xserver-xorg-input-gevdev as it was a temporary solution
+  * Depend on newer utouch-grail for udebs and ABI changes
+  * Build depend on latest xserver-xorg-dev for serverminver dependency
+
+ -- Chase Douglas <chase.douglas@ubuntu.com>  Fri, 20 Aug 2010 16:47:09 -0400
+
 xserver-xorg-input-evdev (1:2.3.2-6) unstable; urgency=low
 
   [ Julien Cristau ]

@@ -1,0 +1,26 @@
+Fix touchup problem on touchpads
+
+--- a/src/evdev.c
++++ b/src/evdev.c
+@@ -406,7 +406,7 @@
+     *num_v = *first_v = 0;
+ 
+     /* convert to relative motion for touchpads */
+-    if (pEvdev->abs && (pEvdev->flags & EVDEV_TOUCHPAD)) {
++    if (pEvdev->flags & EVDEV_TOUCHPAD) {
+         if (pEvdev->tool) { /* meaning, touch is active */
+             if (pEvdev->old_vals[0] != -1)
+                 pEvdev->delta[REL_X] = pEvdev->vals[0] - pEvdev->old_vals[0];
+@@ -419,8 +419,10 @@
+         } else {
+             pEvdev->old_vals[0] = pEvdev->old_vals[1] = -1;
+         }
+-        pEvdev->abs = 0;
+-        pEvdev->rel = 1;
++	if (pEvdev->abs) {
++		pEvdev->abs = 0;
++		pEvdev->rel = 1;
++	}
+     }
+ 
+     if (pEvdev->rel) {

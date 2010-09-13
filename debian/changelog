@@ -1,3 +1,10 @@
+xserver-xorg-input-evdev (1:2.3.2-6ubuntu3) maverick; urgency=low
+
+  * Set default input module to evdev for Apple Magic Mouse (LP: #637430)
+    - Add debian/local/60-magictrackpad.conf
+
+ -- Chase Douglas <chase.douglas@canonical.com>  Thu, 16 Sep 2010 09:38:26 +0200
+
 xserver-xorg-input-evdev (1:2.3.2-6ubuntu2) maverick; urgency=low
 
   * Add 102-magic-mouse.patch - Patch from Chase Douglas to set default

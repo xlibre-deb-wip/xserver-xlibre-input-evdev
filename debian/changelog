@@ -1,3 +1,22 @@
+xserver-xorg-input-evdev (1:2.5.0-1) experimental; urgency=low
+
+  [ Robert Hooker ]
+  * New upstream release.
+  * Bump xutils-dev build dep for new util-macros.
+
+  [ Cyril Brulebois ]
+  * New upstream release fixes some bugs:
+     - Forward keycodes > 255 (Closes: #500096).
+     - No longer list README.mouse (Closes: #590529).
+
+ -- Cyril Brulebois <kibi@debian.org>  Thu, 21 Oct 2010 19:49:10 +0200
+
+xserver-xorg-input-evdev (1:2.3.2-7) experimental; urgency=low
+
+  * Build against Xserver 1.9.1 rc1.
+
+ -- Cyril Brulebois <kibi@debian.org>  Tue, 12 Oct 2010 23:52:24 +0200
+
 xserver-xorg-input-evdev (1:2.3.2-6ubuntu3) maverick; urgency=low
 
   * Set default input module to evdev for Apple Magic Mouse (LP: #637430)

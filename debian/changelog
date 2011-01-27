@@ -1,3 +1,23 @@
+xserver-xorg-input-evdev (1:2.6.0-1ubuntu1) UNRELEASED; urgency=low
+
+  [ Robert Hooker ]
+  * Merge from Debian Experimental. Remaining Ubuntu changes:
+    - Set default input module to evdev for Apple Magic Mouse (LP: #637430)
+    - Add debian/local/60-magictrackpad.conf
+    - Add gesture support
+    - Add debian/patches/100-fix-touchup-problem-on-touchpads.patch and
+      debian/patches/101-gestures.patch
+    - debian/rules: add configure option to enable utouch-grail support
+    - Replace xserver-xorg-input-gevdev as it was a temporary solution
+    - Depend on newer utouch-grail for udebs and ABI changes
+  * Patches that need refreshing before upload:
+    - 100-fix-touchup-problem-on-touchpads.patch
+    - 101-gestures.patch     
+
+  [ Christopher James Halse Rogers ]
+
+ -- Christopher James Halse Rogers <raof@ubuntu.com>  Fri, 28 Jan 2011 10:54:01 +1100
+
 xserver-xorg-input-evdev (1:2.6.0-1) experimental; urgency=low
 
   * New upstream release.
@@ -24,23 +44,6 @@ xserver-xorg-input-evdev (1:2.5.99.901-1) experimental; urgency=low
   * New upstream release.
 
  -- Cyril Brulebois <kibi@debian.org>  Mon, 22 Nov 2010 15:50:51 +0100
-
-xserver-xorg-input-evdev (1:2.5.0-1ubuntu1) UNRELEASED; urgency=low
-
-  * Merge from Debian Experimental. Remaining Ubuntu changes:
-    - Set default input module to evdev for Apple Magic Mouse (LP: #637430)
-    - Add debian/local/60-magictrackpad.conf
-    - Add gesture support
-    - Add debian/patches/100-fix-touchup-problem-on-touchpads.patch and
-      debian/patches/101-gestures.patch
-    - debian/rules: add configure option to enable utouch-grail support
-    - Replace xserver-xorg-input-gevdev as it was a temporary solution
-    - Depend on newer utouch-grail for udebs and ABI changes
-  * Patches that need refreshing before upload:
-    - 100-fix-touchup-problem-on-touchpads.patch
-    - 101-gestures.patch     
-
- -- Robert Hooker <sarvatt@ubuntu.com>  Tue, 02 Nov 2010 16:22:45 -0400
 
 xserver-xorg-input-evdev (1:2.5.0-1) experimental; urgency=low
 

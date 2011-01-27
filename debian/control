@@ -24,7 +24,7 @@ Vcs-Git: git://git.debian.org/git/pkg-xorg/driver/xserver-xorg-input-evdev
 Vcs-Browser: http://git.debian.org/?p=pkg-xorg/driver/xserver-xorg-input-evdev.git
 
 Package: xserver-xorg-input-evdev
-Architecture: any
+Architecture: linux-any
 Depends: ${shlibs:Depends}, ${misc:Depends}, ${xinpdriver:Depends},
  libutouch-grail1 (>= 1.0.10)
 Provides: ${xinpdriver:Provides}
@@ -43,7 +43,7 @@ Description: X.Org X server -- evdev input driver
 Package: xserver-xorg-input-evdev-udeb
 XC-Package-Type: udeb
 Section: debian-installer
-Architecture: any
+Architecture: linux-any
 Depends: ${shlibs:Depends}, ${misc:Depends}, ${xserver:Depends},
  udev-udeb [linux-any],
 Provides: ${xinpdriver:Provides}

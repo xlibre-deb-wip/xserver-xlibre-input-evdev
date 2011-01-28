@@ -1,4 +1,4 @@
-xserver-xorg-input-evdev (1:2.6.0-1ubuntu1) UNRELEASED; urgency=low
+xserver-xorg-input-evdev (1:2.6.0-1ubuntu1) natty; urgency=low
 
   [ Robert Hooker ]
   * Merge from Debian Experimental. Remaining Ubuntu changes:

@@ -1,12 +1,28 @@
-Index: xserver-xorg-input-evdev/configure.ac
-===================================================================
---- xserver-xorg-input-evdev.orig/configure.ac	2011-01-28 12:20:11.311087001 +1100
-+++ xserver-xorg-input-evdev/configure.ac	2011-01-28 12:20:13.601087001 +1100
-@@ -65,6 +65,22 @@
+From 9950e5b2e2019698a3ddc3eac608a43a974860ea Mon Sep 17 00:00:00 2001
+From: Chase Douglas <chase.douglas@canonical.com>
+Date: Tue, 25 Jan 2011 22:35:07 -0500
+Subject: [PATCH] Gesture patch
+
+---
+ configure.ac       |   16 +++
+ src/Makefile.am    |    7 +-
+ src/evdev-grail.c  |  304 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/evdev-grail.h  |    9 ++
+ src/evdev.c        |   28 ++++--
+ src/evdev.h        |    6 +
+ src/gestureproto.h |  132 +++++++++++++++++++++++
+ 7 files changed, 493 insertions(+), 9 deletions(-)
+ create mode 100644 src/evdev-grail.c
+ create mode 100644 src/evdev-grail.h
+ create mode 100644 src/gestureproto.h
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -65,6 +65,22 @@ sdkdir=`$PKG_CONFIG --variable=sdkdir xo
  AC_ARG_WITH([sdkdir], [], [sdkdir="$withval"])
  AC_SUBST([sdkdir])
  
-+AC_ARG_ENABLE(utouch-grail, AS_HELP_STRING([--enable-grail], [Build with utouch-grail gesture support (default: auto)]), [GRAIL=$enableval], [GRAIL=auto])
++AC_ARG_ENABLE(utouch-grail, AS_HELP_STRING([--enable-utouch-grail], [Build with utouch-grail gesture support (default: auto)]), [GRAIL=$enableval], [GRAIL=auto])
 +PKG_CHECK_MODULES(GRAIL, utouch-grail, [have_grail=yes], [have_grail=no])
 +if test "x$GRAIL" = xauto; then
 +        GRAIL="$have_grail"
@@ -25,19 +41,13 @@ Index: xserver-xorg-input-evdev/configure.ac
  DRIVER_NAME=evdev
  AC_SUBST([DRIVER_NAME])
  
-Index: xserver-xorg-input-evdev/src/Makefile.am
-===================================================================
---- xserver-xorg-input-evdev.orig/src/Makefile.am	2011-01-28 12:20:11.331087001 +1100
-+++ xserver-xorg-input-evdev/src/Makefile.am	2011-01-28 12:20:13.601087001 +1100
-@@ -29,11 +29,18 @@
- AM_CPPFLAGS =-I$(top_srcdir)/include
- 
- @DRIVER_NAME@_drv_la_LTLIBRARIES = @DRIVER_NAME@_drv.la
--@DRIVER_NAME@_drv_la_LDFLAGS = -module -avoid-version
-+@DRIVER_NAME@_drv_la_LDFLAGS = -module -avoid-version 
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -32,8 +32,15 @@ AM_CPPFLAGS =-I$(top_srcdir)/include
+ @DRIVER_NAME@_drv_la_LDFLAGS = -module -avoid-version
  @DRIVER_NAME@_drv_ladir = @inputdir@
  
-+@DRIVER_NAME@_drv_la_LIBS = @GRAIL_LIBS@
++@DRIVER_NAME@_drv_la_LIBADD = @GRAIL_LIBS@
 +
 +if USE_GRAIL
 +GRAIL_SRC=evdev-grail.c evdev-grail.h
@@ -45,15 +55,13 @@ Index: xserver-xorg-input-evdev/src/Makefile.am
 +
  @DRIVER_NAME@_drv_la_SOURCES = @DRIVER_NAME@.c \
                                 @DRIVER_NAME@.h \
-+			       $(GRAIL_SRC) \
++                               $(GRAIL_SRC) \
                                 emuMB.c \
                                 emuWheel.c \
                                 draglock.c
-Index: xserver-xorg-input-evdev/src/evdev-grail.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ xserver-xorg-input-evdev/src/evdev-grail.c	2011-01-28 12:20:13.601087001 +1100
-@@ -0,0 +1,313 @@
+--- /dev/null
++++ b/src/evdev-grail.c
+@@ -0,0 +1,304 @@
 +/*
 + * Copyright © 2010 Canonical, Ltd.
 + *
@@ -86,6 +94,7 @@ Index: xserver-xorg-input-evdev/src/evdev-grail.c
 +#include "config.h"
 +#endif
 +
++#include <xorg-server.h>
 +#include <X11/Xatom.h>
 +#include <xf86.h>
 +#include <xf86Xinput.h>
@@ -101,6 +110,17 @@ Index: xserver-xorg-input-evdev/src/evdev-grail.c
 +/* Copied from evdev.c, will be in evdev.h when xserver 1.9 is merged */
 +#define EVDEV_RELATIVE_EVENTS   (1 << 2)
 +#define EVDEV_TOUCHPAD          (1 << 4)
++
++/*
++ * Provided by the Maverick X server, we don't want to pollute the official
++ * X.org API.
++ */
++extern _X_EXPORT void xf86PostGestureEvent(DeviceIntPtr dev, unsigned short x,
++                         unsigned short y, unsigned short client_id,
++                         unsigned short gesture_id, unsigned short gesture_type,
++                         Window root, Window event, Window child,
++                         unsigned short status, unsigned short num_props,
++                         float *props);
 +
 +static WindowPtr CommonAncestor(WindowPtr a, WindowPtr b)
 +{
@@ -269,28 +289,8 @@ Index: xserver-xorg-input-evdev/src/evdev-grail.c
 +{
 +    InputInfoPtr pInfo = grail->priv;
 +    EvdevPtr pEvdev = pInfo->private;
-+    GestureEvent event;
-+    float props[DIM_GRAIL_PROP];
-+    int len = sizeof(GestureEvent) + ev->nprop * sizeof(grail_prop_t);
-+
-+    /* Client could have disappeared by now */
-+    if (!clients[ev->client_id.client])
-+        return;
-+
-+    event.type = GenericEvent;
-+    event.extension = GestureReqCode;
-+    event.sequenceNumber = clients[ev->client_id.client]->sequence;
-+    event.evtype = 0;
-+    event.time = GetTimeInMillis();
-+    event.length = (len - sizeof(xEvent)) / 4;
-+    event.gesture_id = ev->id;
-+    event.gesture_type = ev->type;
-+    event.device_id = pInfo->dev->id;
-+    event.root = ev->client_id.root;
-+    event.event = ev->client_id.event;
-+    event.child = ev->client_id.child;
-+    event.status = ev->status;
-+    event.num_props = ev->nprop;
++    int x;
++    int y;
 +
 +    /* Override event focus point if this is a relative device */
 +    if (pEvdev->flags & (EVDEV_RELATIVE_EVENTS | EVDEV_TOUCHPAD))
@@ -302,18 +302,17 @@ Index: xserver-xorg-input-evdev/src/evdev-grail.c
 +            return;
 +
 +        /* Note: Master device valuators are in screen coordinates */
-+        event.focus_x = master->last.valuators[0];
-+        event.focus_y = master->last.valuators[1];
++        x = master->last.valuators[0];
++        y = master->last.valuators[1];
 +    } else {
-+        event.focus_x = ev->pos.x;
-+        event.focus_y = ev->pos.y;
++        x = ev->pos.x;
++        y = ev->pos.y;
 +    }
 +
-+    memcpy(props, ev->prop, ev->nprop * sizeof(grail_prop_t));
-+
-+    WriteToClient(clients[ev->client_id.client], sizeof(GestureEvent), &event);
-+    WriteToClient(clients[ev->client_id.client],
-+                  sizeof(float) * event.num_props, props);
++    xf86PostGestureEvent(pInfo->dev, x, y, ev->client_id.client, ev->id,
++                         ev->type, ev->client_id.root, ev->client_id.event,
++                         ev->client_id.child, ev->status,
++                         ev->nprop, (float *)ev->prop);
 +}
 +
 +int
@@ -367,10 +366,8 @@ Index: xserver-xorg-input-evdev/src/evdev-grail.c
 +        pEvdev->grail = NULL;
 +    }
 +}
-Index: xserver-xorg-input-evdev/src/evdev-grail.h
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ xserver-xorg-input-evdev/src/evdev-grail.h	2011-01-28 12:20:13.601087001 +1100
+--- /dev/null
++++ b/src/evdev-grail.h
 @@ -0,0 +1,9 @@
 +#ifndef EVDEV_GRAIL_H_
 +#define EVDEV_GRAIL_H_
@@ -381,10 +378,8 @@ Index: xserver-xorg-input-evdev/src/evdev-grail.h
 +extern void GrailClose(InputInfoPtr pInfo);
 +
 +#endif /* _EVDEV_GRAIL_H_ */
-Index: xserver-xorg-input-evdev/src/evdev.c
-===================================================================
---- xserver-xorg-input-evdev.orig/src/evdev.c	2011-01-28 12:20:11.361087001 +1100
-+++ xserver-xorg-input-evdev/src/evdev.c	2011-01-28 12:22:16.411087001 +1100
+--- a/src/evdev.c
++++ b/src/evdev.c
 @@ -71,6 +71,13 @@
  #define MAXDEVICES MAX_DEVICES
  #endif
@@ -399,7 +394,7 @@ Index: xserver-xorg-input-evdev/src/evdev.c
  #define ArrayLength(a) (sizeof(a) / (sizeof((a)[0])))
  
  #define MIN_KEYCODE 8
-@@ -829,7 +836,7 @@
+@@ -829,7 +836,7 @@ EvdevProcessSyncEvent(InputInfoPtr pInfo
   * Process the events from the device; nothing is actually posted to the server
   * until an EV_SYN event is received.
   */
@@ -408,20 +403,14 @@ Index: xserver-xorg-input-evdev/src/evdev.c
  EvdevProcessEvent(InputInfoPtr pInfo, struct input_event *ev)
  {
      switch (ev->type) {
-@@ -858,12 +865,20 @@
- static void
- EvdevReadInput(InputInfoPtr pInfo)
- {
-+#if USE_GRAIL
-+    EvdevPtr pEvdev = pInfo->private;
-+#endif
-     struct input_event ev[NUM_EVENTS];
-     int i, len = sizeof(ev);
+@@ -863,7 +870,14 @@ EvdevReadInput(InputInfoPtr pInfo)
  
      while (len == sizeof(ev))
      {
 -        len = read(pInfo->fd, &ev, sizeof(ev));
 +#if USE_GRAIL
++        EvdevPtr pEvdev = pInfo->private;
++
 +        if (pEvdev->grail)
 +            len = grail_pull(pEvdev->grail, pInfo->fd);
 +        else
@@ -430,7 +419,7 @@ Index: xserver-xorg-input-evdev/src/evdev.c
          if (len <= 0)
          {
              if (errno == ENODEV) /* May happen after resume */
-@@ -881,6 +896,11 @@
+@@ -881,6 +895,11 @@ EvdevReadInput(InputInfoPtr pInfo)
              break;
          }
  
@@ -442,7 +431,7 @@ Index: xserver-xorg-input-evdev/src/evdev.c
          /* The kernel promises that we always only read a complete
           * event, so len != sizeof ev is an error. */
          if (len % sizeof(ev[0])) {
-@@ -1305,7 +1325,7 @@
+@@ -1305,7 +1324,7 @@ EvdevAddAbsClass(DeviceIntPtr device)
      memset(pEvdev->old_vals, -1, num_axes * sizeof(int));
      atoms = malloc(pEvdev->num_vals * sizeof(Atom));
  
@@ -451,7 +440,7 @@ Index: xserver-xorg-input-evdev/src/evdev.c
          pEvdev->axis_map[axis] = -1;
          if (!TestBit(axis, pEvdev->abs_bitmask))
              continue;
-@@ -1328,7 +1348,7 @@
+@@ -1328,7 +1347,7 @@ EvdevAddAbsClass(DeviceIntPtr device)
          return !Success;
      }
  
@@ -460,15 +449,16 @@ Index: xserver-xorg-input-evdev/src/evdev.c
          int axnum = pEvdev->axis_map[axis];
          int resolution = 10000;
  
-@@ -1722,7 +1742,6 @@
+@@ -1394,6 +1413,8 @@ EvdevAddAbsClass(DeviceIntPtr device)
+         free(mode);
+     }
+ 
++    GrailOpen(pInfo);
++
      return Success;
  }
  
--
- static int
- EvdevProc(DeviceIntPtr device, int what)
- {
-@@ -1761,6 +1780,7 @@
+@@ -1761,6 +1782,7 @@ EvdevProc(DeviceIntPtr device, int what)
              close(pInfo->fd);
              pInfo->fd = -1;
          }
@@ -476,20 +466,9 @@ Index: xserver-xorg-input-evdev/src/evdev.c
          EvdevRemoveDevice(pInfo);
          pEvdev->min_maj = 0;
  	break;
-@@ -1998,6 +2018,8 @@
-         xf86Msg(X_PROBED, "%s: Found absolute axes\n", pInfo->name);
-         pEvdev->flags |= EVDEV_ABSOLUTE_EVENTS;
- 
-+	GrailOpen(pInfo);
-+
-         if ((TestBit(ABS_X, pEvdev->abs_bitmask) &&
-              TestBit(ABS_Y, pEvdev->abs_bitmask))) {
-             xf86Msg(X_PROBED, "%s: Found x and y absolute axes\n", pInfo->name);
-Index: xserver-xorg-input-evdev/src/evdev.h
-===================================================================
---- xserver-xorg-input-evdev.orig/src/evdev.h	2011-01-28 12:20:11.351087001 +1100
-+++ xserver-xorg-input-evdev/src/evdev.h	2011-01-28 12:20:13.601087001 +1100
-@@ -196,8 +196,14 @@
+--- a/src/evdev.h
++++ b/src/evdev.h
+@@ -196,8 +196,14 @@ typedef struct {
      /* Event queue used to defer keyboard/button events until EV_SYN time. */
      int                     num_queue;
      EventQueueRec           queue[EVDEV_MAXQUEUE];
@@ -504,10 +483,8 @@ Index: xserver-xorg-input-evdev/src/evdev.h
  /* Event posting functions */
  void EvdevQueueKbdEvent(InputInfoPtr pInfo, struct input_event *ev, int value);
  void EvdevQueueButtonEvent(InputInfoPtr pInfo, int button, int value);
-Index: xserver-xorg-input-evdev/src/gestureproto.h
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ xserver-xorg-input-evdev/src/gestureproto.h	2011-01-28 12:20:13.601087001 +1100
+--- /dev/null
++++ b/src/gestureproto.h
 @@ -0,0 +1,132 @@
 +/*
 + * Copyright © 2010 Canonical, Ltd.

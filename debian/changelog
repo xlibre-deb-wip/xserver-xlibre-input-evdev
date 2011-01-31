@@ -1,3 +1,11 @@
+xserver-xorg-input-evdev (1:2.6.0-1ubuntu3) natty; urgency=low
+
+  * Make xserver-xorg-input-evdev-udeb explicitly depend on
+    libutouch-grail1-udeb, to match the explicit dependency in
+    xserver-xorg-input-evdev.
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Mon, 31 Jan 2011 11:44:35 +0000
+
 xserver-xorg-input-evdev (1:2.6.0-1ubuntu2) natty; urgency=low
 
   * Disable patch 101-gestures.patch - Fix SIGSEGV in xserver.

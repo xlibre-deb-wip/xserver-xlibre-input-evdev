@@ -1,24 +1,8 @@
-From 9950e5b2e2019698a3ddc3eac608a43a974860ea Mon Sep 17 00:00:00 2001
-From: Chase Douglas <chase.douglas@canonical.com>
-Date: Tue, 25 Jan 2011 22:35:07 -0500
-Subject: [PATCH] Gesture patch
-
----
- configure.ac       |   16 +++
- src/Makefile.am    |    7 +-
- src/evdev-grail.c  |  304 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/evdev-grail.h  |    9 ++
- src/evdev.c        |   28 ++++--
- src/evdev.h        |    6 +
- src/gestureproto.h |  132 +++++++++++++++++++++++
- 7 files changed, 493 insertions(+), 9 deletions(-)
- create mode 100644 src/evdev-grail.c
- create mode 100644 src/evdev-grail.h
- create mode 100644 src/gestureproto.h
-
+diff --git a/configure.ac b/configure.ac
+index b4b0bad..86a18ae 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -65,6 +65,22 @@ sdkdir=`$PKG_CONFIG --variable=sdkdir xo
+@@ -68,6 +68,22 @@ sdkdir=`$PKG_CONFIG --variable=sdkdir xorg-server`
  AC_ARG_WITH([sdkdir], [], [sdkdir="$withval"])
  AC_SUBST([sdkdir])
  
@@ -41,14 +25,19 @@ Subject: [PATCH] Gesture patch
  DRIVER_NAME=evdev
  AC_SUBST([DRIVER_NAME])
  
+diff --git a/src/Makefile.am b/src/Makefile.am
+index b8d0dd9..7d05a50 100644
 --- a/src/Makefile.am
 +++ b/src/Makefile.am
-@@ -32,8 +32,15 @@ AM_CPPFLAGS =-I$(top_srcdir)/include
- @DRIVER_NAME@_drv_la_LDFLAGS = -module -avoid-version
+@@ -29,12 +29,17 @@ AM_CFLAGS = $(XORG_CFLAGS) $(CWARNFLAGS)
+ AM_CPPFLAGS =-I$(top_srcdir)/include
+ 
+ @DRIVER_NAME@_drv_la_LTLIBRARIES = @DRIVER_NAME@_drv.la
+-@DRIVER_NAME@_drv_la_LDFLAGS = -module -avoid-version
++@DRIVER_NAME@_drv_la_LDFLAGS = -module -avoid-version @GRAIL_LIBS@
+ @DRIVER_NAME@_drv_la_LIBADD = $(MTDEV_LIBS)
  @DRIVER_NAME@_drv_ladir = @inputdir@
  
-+@DRIVER_NAME@_drv_la_LIBADD = @GRAIL_LIBS@
-+
 +if USE_GRAIL
 +GRAIL_SRC=evdev-grail.c evdev-grail.h
 +endif
@@ -59,9 +48,12 @@ Subject: [PATCH] Gesture patch
                                 emuMB.c \
                                 emuWheel.c \
                                 draglock.c
+diff --git a/src/evdev-grail.c b/src/evdev-grail.c
+new file mode 100644
+index 0000000..03689ed
 --- /dev/null
 +++ b/src/evdev-grail.c
-@@ -0,0 +1,304 @@
+@@ -0,0 +1,375 @@
 +/*
 + * Copyright © 2010 Canonical, Ltd.
 + *
@@ -170,7 +162,7 @@ Subject: [PATCH] Gesture patch
 +{
 +    WindowPtr child_window;
 +    WindowPtr window;
-+    WindowPtr root_window = NULL;
++    WindowPtr root_window;
 +    InputInfoPtr pInfo = grail->priv;
 +    EvdevPtr pEvdev = pInfo->private;
 +    int j;
@@ -202,6 +194,78 @@ Subject: [PATCH] Gesture patch
 +
 +    memset(clients, 0, sizeof(struct grail_client_info) * max_clients);
 +
++    /* Find the root window. */
++    for (root_window = child_window; root_window->parent;
++         root_window = root_window->parent);
++
++    /*
++     * Check for a root client with SYSFLAG1 set. SYSFLAG1 is effectively an
++     * active grab for system gestures. We assume only one client has SYSFLAG1
++     * set.
++     */
++    window = child_window;
++    while (window)
++    {
++        /* Check if any gestures have been selected on this window. */
++        if (wGestureMasks(window))
++        {
++            GestureClientsPtr client;
++
++            /* For each client */
++            for (client = wGestureMasks(window)->clients; client;
++                 client = client->next)
++            {
++                int first = 1;
++
++                /* If the client has set the SYSFLAG1 bit */
++                if (BitIsOn(client->gestureMask[0], GRAIL_TYPE_SYSFLAG1))
++                {
++                    /* For each recognized gesture */
++                    grail_mask_foreach(type, types, type_bytes)
++                    {
++                        if (type == GRAIL_TYPE_SYSFLAG1)
++                            continue;
++
++                        /*
++                         * Check if this client selected for this gesture.
++                         * Request may be for this device or all devices.
++                         */
++                        if (BitIsOn(client->gestureMask[pInfo->dev->id], type) ||
++                            BitIsOn(client->gestureMask[0], type))
++                        {
++                            if (first) {
++                                /* Set up new client in array */
++                                clients[0].id.client = CLIENT_ID(client->resource);
++                                clients[0].id.root = root_window->drawable.id;
++                                clients[0].id.child = child_window->drawable.id;
++                                clients[0].id.event = root_window->drawable.id;
++                                grail_mask_clear(clients[0].mask,
++                                                 DIM_GRAIL_TYPE_BYTES);
++                                first = 0;
++                            }
++
++                            /* Set this gesture bit in the client's gesture mask */
++                            SetBit(clients[0].mask, type);
++                            num_clients = 1;
++                        }
++                    }
++
++                    /*
++                     * Either we found a gesture, or we stop looking for SYSFLAG1
++                     * clients.
++                     */
++                    if (num_clients) {
++                        SetBit(clients[0].mask, GRAIL_TYPE_SYSFLAG1);
++                        goto next_window;
++                    }
++                }
++            }
++        }
++
++next_window:
++        window = window->parent;
++    }
++
 +    /*
 +     * Traverse the window hierarchy looking for a window with a client
 +     * selecting for one of the recognized gestures.
@@ -222,14 +286,13 @@ Subject: [PATCH] Gesture patch
 +        /* For each recognized gesture */
 +        grail_mask_foreach(type, types, type_bytes)
 +        {
++            if (type == GRAIL_TYPE_SYSFLAG1)
++                continue;
++
 +            /* Check if any client selected for this gesture on the window */
 +            if (BitIsOn(wGestureMasks(window)->mask, type))
 +            {
 +                GestureClientsPtr client;
-+
-+                if (!root_window)
-+                    for (root_window = window; root_window->parent;
-+                         root_window = root_window->parent);
 +
 +                /* For each client that selected for gestures on this window */
 +                for (client = wGestureMasks(window)->clients; client;
@@ -366,6 +429,9 @@ Subject: [PATCH] Gesture patch
 +        pEvdev->grail = NULL;
 +    }
 +}
+diff --git a/src/evdev-grail.h b/src/evdev-grail.h
+new file mode 100644
+index 0000000..5c93f15
 --- /dev/null
 +++ b/src/evdev-grail.h
 @@ -0,0 +1,9 @@
@@ -378,9 +444,11 @@ Subject: [PATCH] Gesture patch
 +extern void GrailClose(InputInfoPtr pInfo);
 +
 +#endif /* _EVDEV_GRAIL_H_ */
+diff --git a/src/evdev.c b/src/evdev.c
+index 1915e98..8764b63 100644
 --- a/src/evdev.c
 +++ b/src/evdev.c
-@@ -71,6 +71,13 @@
+@@ -60,6 +60,13 @@
  #define MAXDEVICES MAX_DEVICES
  #endif
  
@@ -394,7 +462,7 @@ Subject: [PATCH] Gesture patch
  #define ArrayLength(a) (sizeof(a) / (sizeof((a)[0])))
  
  #define MIN_KEYCODE 8
-@@ -829,7 +836,7 @@ EvdevProcessSyncEvent(InputInfoPtr pInfo
+@@ -897,7 +904,7 @@ EvdevProcessSyncEvent(InputInfoPtr pInfo, struct input_event *ev)
   * Process the events from the device; nothing is actually posted to the server
   * until an EV_SYN event is received.
   */
@@ -403,23 +471,29 @@ Subject: [PATCH] Gesture patch
  EvdevProcessEvent(InputInfoPtr pInfo, struct input_event *ev)
  {
      switch (ev->type) {
-@@ -863,7 +870,14 @@ EvdevReadInput(InputInfoPtr pInfo)
+@@ -931,17 +938,14 @@ EvdevReadInput(InputInfoPtr pInfo)
  
      while (len == sizeof(ev))
      {
--        len = read(pInfo->fd, &ev, sizeof(ev));
+-#ifdef MULTITOUCH
 +#if USE_GRAIL
-+        EvdevPtr pEvdev = pInfo->private;
-+
+         EvdevPtr pEvdev = pInfo->private;
+ 
+-        if (pEvdev->mtdev)
+-            len = mtdev_get(pEvdev->mtdev, pInfo->fd, ev, NUM_EVENTS) *
+-                sizeof(struct input_event);
 +        if (pEvdev->grail)
 +            len = grail_pull(pEvdev->grail, pInfo->fd);
-+        else
-+#endif
+         else
+-            len = read(pInfo->fd, &ev, sizeof(ev));
+-#else
+-            len = read(pInfo->fd, &ev, sizeof(ev));
+ #endif
 +            len = read(pInfo->fd, &ev, sizeof(ev));
          if (len <= 0)
          {
              if (errno == ENODEV) /* May happen after resume */
-@@ -881,6 +895,11 @@ EvdevReadInput(InputInfoPtr pInfo)
+@@ -959,6 +963,11 @@ EvdevReadInput(InputInfoPtr pInfo)
              break;
          }
  
@@ -431,44 +505,28 @@ Subject: [PATCH] Gesture patch
          /* The kernel promises that we always only read a complete
           * event, so len != sizeof ev is an error. */
          if (len % sizeof(ev[0])) {
-@@ -1305,7 +1324,7 @@ EvdevAddAbsClass(DeviceIntPtr device)
-     memset(pEvdev->old_vals, -1, num_axes * sizeof(int));
-     atoms = malloc(pEvdev->num_vals * sizeof(Atom));
- 
--    for (axis = ABS_X; i < MAX_VALUATORS && axis <= ABS_MAX; axis++) {
-+    for (axis = ABS_X; i < MAX_VALUATORS && axis <= ABS_MISC; axis++) {
-         pEvdev->axis_map[axis] = -1;
-         if (!TestBit(axis, pEvdev->abs_bitmask))
-             continue;
-@@ -1328,7 +1347,7 @@ EvdevAddAbsClass(DeviceIntPtr device)
-         return !Success;
-     }
- 
--    for (axis = ABS_X; axis <= ABS_MAX; axis++) {
-+    for (axis = ABS_X; axis <= ABS_MISC; axis++) {
-         int axnum = pEvdev->axis_map[axis];
-         int resolution = 10000;
- 
-@@ -1394,6 +1413,8 @@ EvdevAddAbsClass(DeviceIntPtr device)
-         free(mode);
-     }
- 
-+    GrailOpen(pInfo);
-+
-     return Success;
- }
- 
-@@ -1761,6 +1782,7 @@ EvdevProc(DeviceIntPtr device, int what)
-             close(pInfo->fd);
-             pInfo->fd = -1;
-         }
+@@ -1613,6 +1622,7 @@ EvdevProc(DeviceIntPtr device, int what)
+         if (pEvdev->mtdev)
+             mtdev_close(pEvdev->mtdev);
+ #endif
 +        GrailClose(pInfo);
          EvdevRemoveDevice(pInfo);
          pEvdev->min_maj = 0;
  	break;
+@@ -1850,6 +1860,8 @@ EvdevProbe(InputInfoPtr pInfo)
+         xf86Msg(X_PROBED, "%s: Found absolute axes\n", pInfo->name);
+         pEvdev->flags |= EVDEV_ABSOLUTE_EVENTS;
+ 
++        GrailOpen(pInfo);
++
+         if ((TestBit(ABS_X, pEvdev->abs_bitmask) &&
+              TestBit(ABS_Y, pEvdev->abs_bitmask))) {
+             xf86Msg(X_PROBED, "%s: Found x and y absolute axes\n", pInfo->name);
+diff --git a/src/evdev.h b/src/evdev.h
+index 3c49e91..6b67104 100644
 --- a/src/evdev.h
 +++ b/src/evdev.h
-@@ -196,8 +196,14 @@ typedef struct {
+@@ -205,8 +205,14 @@ typedef struct {
      /* Event queue used to defer keyboard/button events until EV_SYN time. */
      int                     num_queue;
      EventQueueRec           queue[EVDEV_MAXQUEUE];
@@ -483,6 +541,9 @@ Subject: [PATCH] Gesture patch
  /* Event posting functions */
  void EvdevQueueKbdEvent(InputInfoPtr pInfo, struct input_event *ev, int value);
  void EvdevQueueButtonEvent(InputInfoPtr pInfo, int button, int value);
+diff --git a/src/gestureproto.h b/src/gestureproto.h
+new file mode 100644
+index 0000000..a60dcb8
 --- /dev/null
 +++ b/src/gestureproto.h
 @@ -0,0 +1,132 @@

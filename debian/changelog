@@ -1,3 +1,10 @@
+xserver-xorg-input-evdev (1:2.6.0-1ubuntu7) UNRELEASED; urgency=low
+
+  * Drop 100-fix-touchup-problem-on-touchpads.patch
+    - Upstream fixed the issue
+
+ -- Chase Douglas <chase.douglas@ubuntu.com>  Tue, 01 Feb 2011 17:10:23 -0500
+
 xserver-xorg-input-evdev (1:2.6.0-1ubuntu6) natty; urgency=low
 
   * debian/control: Bump xserver build-depend to really, really rebuild against

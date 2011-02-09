@@ -8,8 +8,9 @@ xserver-xorg-input-evdev (1:2.6.0-1ubuntu7) UNRELEASED; urgency=low
     - Bump dependency on xserver-xorg-dev for xi 2.1
     - Add new xi 2.1 dependency on libmtdev-dev and libutouch-grail1-dev
     - Bump runtime dependency on libutouch-grail1 to 1.0.19
+  * Revert rule for Magic Trackpad, synaptics will handle it now
 
- -- Chase Douglas <chase.douglas@ubuntu.com>  Mon, 21 Feb 2011 18:49:27 -0500
+ -- Chase Douglas <chase.douglas@ubuntu.com>  Mon, 21 Feb 2011 18:50:15 -0500
 
 xserver-xorg-input-evdev (1:2.6.0-1ubuntu6) natty; urgency=low
 

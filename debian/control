@@ -49,7 +49,7 @@ Architecture: linux-any
 Depends: ${shlibs:Depends}, ${misc:Depends}, ${xserver:Depends},
  udev-udeb [linux-any],
  libutouch-grail1-udeb (>= 1.0.19),
- xserver-xorg-core (>= 2:1.9.99.902-2ubuntu1)
+ xserver-xorg-core-udeb (>= 2:1.9.99.902-2ubuntu1)
 Provides: ${xinpdriver:Provides}
 Description: X.Org X server -- evdev input driver
  This is a udeb, or a microdeb, for the debian-installer.

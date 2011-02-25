@@ -1,3 +1,10 @@
+xserver-xorg-input-evdev (1:2.6.0-1ubuntu8) natty; urgency=low
+
+  * Make xserver-xorg-input-evdev-udeb depend on xserver-xorg-core-udeb, not
+    xserver-xorg-core.
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Wed, 23 Feb 2011 15:05:58 +0000
+
 xserver-xorg-input-evdev (1:2.6.0-1ubuntu7) natty; urgency=low
 
   * Drop 100-fix-touchup-problem-on-touchpads.patch

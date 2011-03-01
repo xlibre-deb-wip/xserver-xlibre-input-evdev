@@ -1,8 +1,9 @@
-xserver-xorg-input-evdev (1:2.6.0-1ubuntu9) UNRELEASED; urgency=low
+xserver-xorg-input-evdev (1:2.6.0-1ubuntu9) natty; urgency=low
 
+  [ Chase Douglas ]
   * Fix evdev when handling devices with full array of abs axes (LP: #725202)
 
- -- Chase Douglas <chase.douglas@ubuntu.com>  Tue, 01 Mar 2011 09:10:35 -0500
+ -- Alberto Milone <alberto.milone@canonical.com>  Tue, 01 Mar 2011 16:56:14 +0100
 
 xserver-xorg-input-evdev (1:2.6.0-1ubuntu8) natty; urgency=low
 

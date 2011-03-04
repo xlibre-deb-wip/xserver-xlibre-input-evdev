@@ -1,8 +1,6 @@
-diff --git a/configure.ac b/configure.ac
-index b4b0bad..86a18ae 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -68,6 +68,22 @@ sdkdir=`$PKG_CONFIG --variable=sdkdir xorg-server`
+@@ -68,6 +68,22 @@ sdkdir=`$PKG_CONFIG --variable=sdkdir xo
  AC_ARG_WITH([sdkdir], [], [sdkdir="$withval"])
  AC_SUBST([sdkdir])
  
@@ -25,8 +23,6 @@ index b4b0bad..86a18ae 100644
  DRIVER_NAME=evdev
  AC_SUBST([DRIVER_NAME])
  
-diff --git a/src/Makefile.am b/src/Makefile.am
-index b8d0dd9..7d05a50 100644
 --- a/src/Makefile.am
 +++ b/src/Makefile.am
 @@ -29,12 +29,17 @@ AM_CFLAGS = $(XORG_CFLAGS) $(CWARNFLAGS)
@@ -48,9 +44,6 @@ index b8d0dd9..7d05a50 100644
                                 emuMB.c \
                                 emuWheel.c \
                                 draglock.c
-diff --git a/src/evdev-grail.c b/src/evdev-grail.c
-new file mode 100644
-index 0000000..03689ed
 --- /dev/null
 +++ b/src/evdev-grail.c
 @@ -0,0 +1,375 @@
@@ -238,7 +231,7 @@ index 0000000..03689ed
 +                                clients[0].id.client = CLIENT_ID(client->resource);
 +                                clients[0].id.root = root_window->drawable.id;
 +                                clients[0].id.child = child_window->drawable.id;
-+                                clients[0].id.event = root_window->drawable.id;
++                                clients[0].id.event = window->drawable.id;
 +                                grail_mask_clear(clients[0].mask,
 +                                                 DIM_GRAIL_TYPE_BYTES);
 +                                first = 0;
@@ -429,9 +422,6 @@ index 0000000..03689ed
 +        pEvdev->grail = NULL;
 +    }
 +}
-diff --git a/src/evdev-grail.h b/src/evdev-grail.h
-new file mode 100644
-index 0000000..5c93f15
 --- /dev/null
 +++ b/src/evdev-grail.h
 @@ -0,0 +1,9 @@
@@ -444,8 +434,6 @@ index 0000000..5c93f15
 +extern void GrailClose(InputInfoPtr pInfo);
 +
 +#endif /* _EVDEV_GRAIL_H_ */
-diff --git a/src/evdev.c b/src/evdev.c
-index 1915e98..8764b63 100644
 --- a/src/evdev.c
 +++ b/src/evdev.c
 @@ -60,6 +60,13 @@
@@ -462,7 +450,7 @@ index 1915e98..8764b63 100644
  #define ArrayLength(a) (sizeof(a) / (sizeof((a)[0])))
  
  #define MIN_KEYCODE 8
-@@ -897,7 +904,7 @@ EvdevProcessSyncEvent(InputInfoPtr pInfo, struct input_event *ev)
+@@ -900,7 +907,7 @@ EvdevProcessSyncEvent(InputInfoPtr pInfo
   * Process the events from the device; nothing is actually posted to the server
   * until an EV_SYN event is received.
   */
@@ -471,7 +459,7 @@ index 1915e98..8764b63 100644
  EvdevProcessEvent(InputInfoPtr pInfo, struct input_event *ev)
  {
      switch (ev->type) {
-@@ -931,17 +938,14 @@ EvdevReadInput(InputInfoPtr pInfo)
+@@ -934,17 +941,14 @@ EvdevReadInput(InputInfoPtr pInfo)
  
      while (len == sizeof(ev))
      {
@@ -493,7 +481,7 @@ index 1915e98..8764b63 100644
          if (len <= 0)
          {
              if (errno == ENODEV) /* May happen after resume */
-@@ -959,6 +963,11 @@ EvdevReadInput(InputInfoPtr pInfo)
+@@ -962,6 +966,11 @@ EvdevReadInput(InputInfoPtr pInfo)
              break;
          }
  
@@ -505,7 +493,7 @@ index 1915e98..8764b63 100644
          /* The kernel promises that we always only read a complete
           * event, so len != sizeof ev is an error. */
          if (len % sizeof(ev[0])) {
-@@ -1613,6 +1622,7 @@ EvdevProc(DeviceIntPtr device, int what)
+@@ -1620,6 +1629,7 @@ EvdevProc(DeviceIntPtr device, int what)
          if (pEvdev->mtdev)
              mtdev_close(pEvdev->mtdev);
  #endif
@@ -513,7 +501,7 @@ index 1915e98..8764b63 100644
          EvdevRemoveDevice(pInfo);
          pEvdev->min_maj = 0;
  	break;
-@@ -1850,6 +1860,8 @@ EvdevProbe(InputInfoPtr pInfo)
+@@ -1857,6 +1867,8 @@ EvdevProbe(InputInfoPtr pInfo)
          xf86Msg(X_PROBED, "%s: Found absolute axes\n", pInfo->name);
          pEvdev->flags |= EVDEV_ABSOLUTE_EVENTS;
  
@@ -522,11 +510,9 @@ index 1915e98..8764b63 100644
          if ((TestBit(ABS_X, pEvdev->abs_bitmask) &&
               TestBit(ABS_Y, pEvdev->abs_bitmask))) {
              xf86Msg(X_PROBED, "%s: Found x and y absolute axes\n", pInfo->name);
-diff --git a/src/evdev.h b/src/evdev.h
-index 3c49e91..6b67104 100644
 --- a/src/evdev.h
 +++ b/src/evdev.h
-@@ -205,8 +205,14 @@ typedef struct {
+@@ -207,8 +207,14 @@ typedef struct {
      /* Event queue used to defer keyboard/button events until EV_SYN time. */
      int                     num_queue;
      EventQueueRec           queue[EVDEV_MAXQUEUE];
@@ -541,9 +527,6 @@ index 3c49e91..6b67104 100644
  /* Event posting functions */
  void EvdevQueueKbdEvent(InputInfoPtr pInfo, struct input_event *ev, int value);
  void EvdevQueueButtonEvent(InputInfoPtr pInfo, int button, int value);
-diff --git a/src/gestureproto.h b/src/gestureproto.h
-new file mode 100644
-index 0000000..a60dcb8
 --- /dev/null
 +++ b/src/gestureproto.h
 @@ -0,0 +1,132 @@

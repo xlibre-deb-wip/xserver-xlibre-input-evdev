@@ -1,4 +1,4 @@
-xserver-xorg-input-evdev (1:2.6.0-1ubuntu11) UNRELEASED; urgency=low
+xserver-xorg-input-evdev (1:2.6.0-1ubuntu11) natty; urgency=low
 
   [ Chase Douglas ]
   * Fix event handling for devices that provide proximity events (LP: #573006)
@@ -8,7 +8,7 @@ xserver-xorg-input-evdev (1:2.6.0-1ubuntu11) UNRELEASED; urgency=low
     Included is a quirk to enable middle button emulation for the Ubuntu
     branded travel mouse (LP: #746639)
 
- -- Timo Aaltonen <tjaalton@ubuntu.com>  Mon, 04 Apr 2011 16:38:58 +0300
+ -- Timo Aaltonen <tjaalton@ubuntu.com>  Mon, 04 Apr 2011 16:58:27 +0300
 
 xserver-xorg-input-evdev (1:2.6.0-1ubuntu10) natty; urgency=low
 

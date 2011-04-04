@@ -1,8 +1,14 @@
 xserver-xorg-input-evdev (1:2.6.0-1ubuntu11) UNRELEASED; urgency=low
 
+  [ Chase Douglas ]
   * Fix event handling for devices that provide proximity events (LP: #573006)
 
- -- Chase Douglas <chase.douglas@ubuntu.com>  Thu, 17 Mar 2011 09:56:51 -0400
+  [ Timo Aaltonen ]
+  * Add debian/local/11-evdev-quirks.conf and install it to sysconfigdir.
+    Included is a quirk to enable middle button emulation for the Ubuntu
+    branded travel mouse (LP: #746639)
+
+ -- Timo Aaltonen <tjaalton@ubuntu.com>  Mon, 04 Apr 2011 16:38:58 +0300
 
 xserver-xorg-input-evdev (1:2.6.0-1ubuntu10) natty; urgency=low
 

@@ -1,3 +1,10 @@
+xserver-xorg-input-evdev (1:2.6.0-1ubuntu12) UNRELEASED; urgency=low
+
+  * Another fix for event handling for devices that provide proximity events
+    (LP: #573006)
+
+ -- Chase Douglas <chase.douglas@ubuntu.com>  Thu, 14 Apr 2011 16:09:18 -0400
+
 xserver-xorg-input-evdev (1:2.6.0-1ubuntu11) natty; urgency=low
 
   [ Chase Douglas ]

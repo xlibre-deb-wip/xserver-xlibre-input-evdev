@@ -1,3 +1,4 @@
 usr/lib/xorg/modules/input/*.so
 usr/share/man
 ../local/11-evdev-quirks.conf	usr/share/X11/xorg.conf.d/
+../local/11-evdev-trackpoint.conf	usr/share/X11/xorg.conf.d/

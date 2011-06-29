@@ -1,10 +1,5 @@
-xserver-xorg-input-evdev (1:2.6.0-1ubuntu12) oneiric; urgency=low
+xserver-xorg-input-evdev (1:2.6.0-1ubuntu13) oneiric; urgency=low
 
-  [ Chase Douglas ]
-  * Another fix for event handling for devices that provide proximity events
-    (LP: #573006)
-
-  [ Timo Aaltonen ]
   * 11-evdev-trackpoint.conf: Add a config snippet for enabling wheel
     emulation for trackpoint devices, should support a variety of models.
     Middlemouse emulation is turned on, to allow dragging for instance
@@ -14,6 +9,13 @@ xserver-xorg-input-evdev (1:2.6.0-1ubuntu12) oneiric; urgency=low
     to ignore AbsoluteAxis. (LP: #325581)
 
  -- Timo Aaltonen <tjaalton@ubuntu.com>  Wed, 29 Jun 2011 19:17:04 +0300
+
+xserver-xorg-input-evdev (1:2.6.0-1ubuntu12) natty; urgency=low
+
+  * Another fix for event handling for devices that provide proximity events
+    (LP: #573006)
+
+ -- Chase Douglas <chase.douglas@ubuntu.com>  Thu, 14 Apr 2011 16:09:18 -0400
 
 xserver-xorg-input-evdev (1:2.6.0-1ubuntu11) natty; urgency=low
 

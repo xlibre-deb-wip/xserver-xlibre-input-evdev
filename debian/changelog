@@ -10,6 +10,8 @@ xserver-xorg-input-evdev (1:2.6.0-1ubuntu12) UNRELEASED; urgency=low
     Middlemouse emulation is turned on, to allow dragging for instance
     in Nautilus. Thanks to Jens Böning and others for collecting data and
     testing this! (LP: #554984)
+  * 11-evdev-quirks.conf: Add a quirk for Kensington Pocket Mouse / Benq m310
+    to ignore AbsoluteAxis. (LP: #325581)
 
  -- Chase Douglas <chase.douglas@ubuntu.com>  Thu, 14 Apr 2011 16:09:18 -0400
 

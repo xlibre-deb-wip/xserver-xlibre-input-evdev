@@ -17,6 +17,7 @@ Build-Depends:
  libxkbfile-dev,
  xutils-dev (>= 1:7.5+4),
  libmtdev-dev,
+ libudev-dev,
 Standards-Version: 3.9.1
 Vcs-Git: git://git.debian.org/git/pkg-xorg/driver/xserver-xorg-input-evdev
 Vcs-Browser: http://git.debian.org/?p=pkg-xorg/driver/xserver-xorg-input-evdev.git

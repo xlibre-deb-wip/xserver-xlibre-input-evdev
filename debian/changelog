@@ -8,8 +8,9 @@ xserver-xorg-input-evdev (1:2.6.0-2ubuntu1) UNRELEASED; urgency=low
   * Merge in latest upstream multitouch commits
   * Enable multitouch support
   * Bump dependencies for multitouch support
+  * Add build-dep on libudev-dev
 
- -- Chase Douglas <chase.douglas@ubuntu.com>  Thu, 22 Dec 2011 10:17:21 -0800
+ -- Chase Douglas <chase.douglas@ubuntu.com>  Thu, 22 Dec 2011 10:48:48 -0800
 
 xserver-xorg-input-evdev (1:2.6.0-2) unstable; urgency=low
 

@@ -2,8 +2,11 @@ xserver-xorg-input-evdev (1:2.6.0-2ubuntu1) UNRELEASED; urgency=low
 
   * Drop uTouch support, it will be provided elsewhere
     - Drop 101-gestures.patch
+  * Drop prototype XInput multitouch support
+    - Drop 100-xi2.1.patch
+    - Drop 102-fix_valuator_proximity_handling.patch
 
- -- Chase Douglas <chase.douglas@ubuntu.com>  Thu, 22 Dec 2011 10:06:40 -0800
+ -- Chase Douglas <chase.douglas@ubuntu.com>  Thu, 22 Dec 2011 10:08:37 -0800
 
 xserver-xorg-input-evdev (1:2.6.0-2) unstable; urgency=low
 

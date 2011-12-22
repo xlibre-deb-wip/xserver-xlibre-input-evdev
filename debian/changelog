@@ -1,3 +1,28 @@
+xserver-xorg-input-evdev (1:2.6.0-2) unstable; urgency=low
+
+  * Get rid of “[linux-any]” for the dependency on udev-udeb, evdev is
+    Linux-only.
+  * Replace non-breaking spaces with regular spaces in udeb's long
+    description.
+  * Switch to dh:
+    - Bump debhelper build-dep, add dh-autoreconf build-dep.
+    - Bump compat to 8.
+    - Rewrite debian/rules.
+    - Pass --fail-missing to dh_install.
+    - Stop passing --disable-static to configure, that's the default.
+  * Bump xserver-xorg-dev build-dep for dh_xsf_substvars and xsf sequence.
+  * Remove xsfbs accordingly.
+  * Replace ${xserver:Depends} with ${xinpdriver:Depends} in the udeb.
+  * Remove long obsolete Replaces.
+  * Update Uploaders list. Thanks, David & Brice!
+  * Remove build-deps:
+    - dpkg-dev is recent enough on stable and higher.
+    - automake and libtool are pulled through dh-autoreconf.
+  * Bump Standards-Version to 3.9.1 (no changes needed).
+  * Wrap Depends/Provides.
+
+ -- Cyril Brulebois <kibi@debian.org>  Sat, 05 Feb 2011 14:38:02 +0100
+
 xserver-xorg-input-evdev (1:2.6.0-1ubuntu13) oneiric; urgency=low
 
   * 11-evdev-trackpoint.conf: Add a config snippet for enabling wheel

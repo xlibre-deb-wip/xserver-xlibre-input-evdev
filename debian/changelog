@@ -1,3 +1,10 @@
+xserver-xorg-input-evdev (1:2.6.0-2ubuntu1) UNRELEASED; urgency=low
+
+  * Drop uTouch support, it will be provided elsewhere
+    - Drop 101-gestures.patch
+
+ -- Chase Douglas <chase.douglas@ubuntu.com>  Thu, 22 Dec 2011 10:06:40 -0800
+
 xserver-xorg-input-evdev (1:2.6.0-2) unstable; urgency=low
 
   * Get rid of “[linux-any]” for the dependency on udev-udeb, evdev is

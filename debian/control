@@ -16,8 +16,7 @@ Build-Depends:
  x11proto-kb-dev,
  libxkbfile-dev,
  xutils-dev (>= 1:7.5+4),
- libutouch-grail-dev (>= 1.0.10),
- libmtdev-dev
+ libmtdev-dev,
 Standards-Version: 3.9.1
 Vcs-Git: git://git.debian.org/git/pkg-xorg/driver/xserver-xorg-input-evdev
 Vcs-Browser: http://git.debian.org/?p=pkg-xorg/driver/xserver-xorg-input-evdev.git
@@ -28,7 +27,6 @@ Depends:
  ${shlibs:Depends},
  ${misc:Depends},
  ${xinpdriver:Depends},
- libutouch-grail1 (>= 1.0.19),
  xserver-xorg-core (>= 2:1.9.99.902-2ubuntu1)
 Provides:
  ${xinpdriver:Provides}
@@ -51,7 +49,6 @@ Depends:
  ${misc:Depends},
  ${xinpdriver:Depends},
  udev-udeb,
- libutouch-grail1-udeb (>= 1.0.19),
  xserver-xorg-core-udeb (>= 2:1.9.99.902-2ubuntu1)
 Provides:
  ${xinpdriver:Provides}

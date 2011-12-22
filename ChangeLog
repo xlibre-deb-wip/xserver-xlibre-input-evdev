@@ -1,3 +1,662 @@
+commit e99ab2314f712df8dd705b16008755f8b3095707
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue Dec 20 15:08:06 2011 +1000
+
+    Don't count legacy and MT axes twice
+    
+    The kernel exports both ABS_X and ABS_MT_POSITION_X (and a couple others)
+    for a multi-touch capable device. For such devices, only count the axis once
+    since we submit ABS_MT_POSITION_X through ABS_X.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 191660189a01b9c96bb4c0fa1a2e5008ae666238
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue Dec 20 14:14:16 2011 +1000
+
+    Add is_blacklisted_axis() helper
+    
+    The kernel exports a bunch of information as axis that shouldn't be an axis
+    and we don't treat it as axis in the server. Add this helper instead of
+    checking for the axis codes manually.
+    
+    No function change.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit a1c3f8efbbff7f93e216ccdb32bd176a8ba33b09
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue Dec 20 13:32:06 2011 +1000
+
+    Drop now-unnecessary XI 2.1 and XI 2.2 error suppression defines
+    
+    Gone since inputproto 2.1.99.3
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit f3c628acc4f7399325756590cdc72e769341243c
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue Dec 20 10:56:22 2011 +1000
+
+    Map ABS_MT_POSITION_X/Y into ABS_X/Y
+    
+    MT axes are the same as traditional axes, so one into the other so we get
+    x/y coordinates regardless wich axes it comes from.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit fed454192ddc4ad94226040c657deb6abea3df88
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu Dec 15 08:55:32 2011 +1000
+
+    Use xf86InitValuatorAxisStruct, the touch-specific version was dropped
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit cf93a21df1dd66118d3a1f5a0769d48f317de749
+Author: Chase Douglas <chase.douglas@canonical.com>
+Date:   Tue Nov 29 18:02:58 2011 -0800
+
+    Don't send pointer events for multitouch touchscreen devices
+    
+    Pointer events will be emulated by the server.
+    
+    Signed-off-by: Chase Douglas <chase.douglas@canonical.com>
+
+commit fac1a41c75a7c4bfabff34dc8ed1dff2587c6011
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Nov 11 15:57:26 2011 +1000
+
+    Add the required defines to compile against the inputproto
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 3175a2a96d448a0b2584a58ab3d05fbebb11fab1
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed Nov 2 09:53:34 2011 +1000
+
+    Print to the log if we find multitouch axes.
+    
+    No real effect on the code, but it helps to have that line in the log when
+    searching for driver issues.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 5e9b027807cc205dc9c4efbb8360ac4b20317682
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Mon Oct 31 08:58:18 2011 +1000
+
+    Replace 0/1 button values with enums
+    
+    BUTTON_PRESS is much harder to confuse with a button number than a simple 1.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 2ce305129ca94394096f4d697d51eb120de2940b
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed Oct 26 13:21:18 2011 +1000
+
+    Skip event posting for empty slots.
+    
+    ABS_MT_SLOT comes before any other events. The following order of events
+    is common for protocol B devices (and mtdev):
+    
+    ...
+    EV_SYN
+    ABS_MT_SLOT        → posting here means we miss on the position information
+    ABS_MT_POSITION_X
+    ABS_MT_POSITION_Y
+    ABS_MT_SLOT
+    ABS_MT_POSITION_X
+    ABS_MT_POSITION_Y
+    EV_SYN
+    
+    Store the stot state as SLOT_EMPTY after posting an event (i.e. EV_SYN and
+    ABS_MT_SLOT) and then don't post until the next slot/syn event.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 9411749f76c31a8054ded62a6fb767c8135b4d4e
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed Oct 26 13:09:30 2011 +1000
+
+    Replace open_slot/close_slot with a SlotState enum
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 239e972be1f2c6a984dd6c5aecce710d0b866257
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed Oct 26 11:14:04 2011 +1000
+
+    Simplify a condition, only the event type differs here
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 6127923fe0d50cb9b9ac4ae0a3876ba6f180137c
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed Oct 26 10:51:16 2011 +1000
+
+    When resetting the queue, don't reset the touchMask
+    
+    Otherwise we segfault after the first SYN event
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit fc4f98153c2608389d87e37316036a31fb1021e7
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed Oct 26 09:59:34 2011 +1000
+
+    MT axes are counted separately, make sure they're initialized too.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit fabee66bcc7260ec50c3091be3f9b503eea65e61
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue Oct 25 15:06:38 2011 +1000
+
+    0 is the value for "unknown/unlimited" number of touches
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 91d90a79593369ba1079d06a75f09ceaa9143768
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue Oct 25 14:55:47 2011 +1000
+
+    Use mtdev API to allocate/free mtdev structs
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit c1b89bda12c1897120bace941625cfa27e547458
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue Oct 25 14:52:26 2011 +1000
+
+    Remove duplicate line
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 907b7cad3fd892ca3349cd18e9ccdc5659027b40
+Author: Chase Douglas <chase.douglas@canonical.com>
+Date:   Thu Dec 2 18:01:41 2010 -0500
+
+    Ensure touchpad events are always processed with MT
+    
+    Without this change, an MT touchpad in relative mode could end a touch
+    while not resetting the oldMask used to calculate relative values. This
+    fix allows a Magic Trackpad to behave as a relative mode device again.
+    
+    Signed-off-by: Chase Douglas <chase.douglas@canonical.com>
+
+commit c9a2b4e9ce9b15e57241184df78c72ec8f6a4705
+Author: Chase Douglas <chase.douglas@canonical.com>
+Date:   Mon Nov 8 14:35:02 2010 -0500
+
+    Use MTDev for multitouch devices
+    
+    MTDev translates all multitouch devices to the slotted evdev protocol.
+    This provides a clean and uniform interface and reduces message handling
+    inside the input module and X.
+    
+    Signed-off-by: Chase Douglas <chase.douglas@canonical.com>
+
+commit e18abd0049421a98e61c15c2d56cfe2821cf4739
+Author: Chase Douglas <chase.douglas@canonical.com>
+Date:   Mon Nov 8 11:08:01 2010 -0500
+
+    Add experimental XI 2.1 multitouch support
+    
+    This multitouch addition only supports slotted MT evdev protocol
+    devices. Support must be enabled at configure time using
+    --enable-multitouch.
+    
+    Signed-off-by: Chase Douglas <chase.douglas@canonical.com>
+    
+    Amendments: XI_TouchMotion -> XI_TouchUpdate, rename mtMask to mt_mask
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 683a55e504f4fc2d1c847c54986439a0c61b2f20
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue Oct 25 09:59:50 2011 +1000
+
+    Use a new "Virtual Device" boolean property to mark virtual devices
+    
+    Use udev to check for the device's sysfs path, if it contains LNXSYSTM it's
+    a kernel-emulated device. This property can then be used to determine if
+    there are any real devices connected, allowing the desktop environment to
+    e.g. turn off the touchpad whenever there's a mouse attached.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit a9cdb6590cdf72917cdfeb17e2fcc6a110b2c7d1
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Nov 11 07:31:02 2011 +1000
+
+    Move misplaced #endif caused by smooth-scrolling merge
+    
+    Bad conflict resolution in xf86-input-evdev-2.6.0-30-g745fca0
+    
+    Reported-by: Sebastian Glita <glseba@yahoo.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit dd000dd4fa118529809632e610a0a439d7467096
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed Nov 9 16:04:06 2011 +1000
+
+    Bump to 2.6.99
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 745fca03a20117583bc18c7134583311ff52c29c
+Merge: eede8cc b450efd
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed Nov 9 16:01:48 2011 +1000
+
+    Merge branch 'smooth-scrolling'
+    
+    Conflicts:
+    	src/evdev.c
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit b450efdf95999cad08de23ce069f04a66bdae24b
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Aug 19 11:15:09 2011 +1000
+
+    Support smooth scrolling on REL_WHEEL, REL_HWHEEL and REL_DIAL
+    
+    Automatic smooth scrolling setup for these axes, with REL_WHEEL and REL_DIAL
+    both mapping into vscrolling. REL_WHEEL is the preferred axis.
+    
+    Mouse wheel emulation is not yet updated for smooth scrolling.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Daniel Stone <daniel@fooishbar.org>
+
+commit eede8ccffc1a831f4de89403edc8dffd52494e8b
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue Oct 25 15:43:38 2011 +1000
+
+    Don't crop long value from EvdevBitIsSet.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
+    Reviewed-by: Jeremy Huddleston <jeremyhu@apple.com>
+
+commit 2aba790ed3acc3ece5e56dac088e0a0a4a04b45d
+Author: Jools Wills <jools@oxfordinspire.co.uk>
+Date:   Sun Oct 30 23:19:21 2011 +0000
+
+    emuThird: Use xf86SetIntOption, not xf86SetBoolOption for integer values
+    
+    Signed-off-by: Jools Wills <jools@oxfordinspire.co.uk>
+    Reviewed-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 49693892ce35e95674fbb3d2a067c8fa0227da87
+Author: Max Schwarz <Max@x-quadraht.de>
+Date:   Mon Oct 17 21:01:22 2011 +0200
+
+    type-safe inline functions for bitmask manipulation
+    
+    We can't use BitIsSet/SetBit from the server (inputstr.h) since they
+    operate on byte arrays. EvdevSetBit is added in preparation for the
+    "smooth-scrolling on wheel emulation" patch.
+    
+    Signed-off-by: Max Schwarz <Max@x-quadraht.de>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 070f30e08956e7fa8b7f9ca6b94fee3ef39caa1e
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Mon Aug 15 11:34:12 2011 +1000
+
+    Exit axis labelling if axes are neither rel nor abs
+    
+    No actual effect since labels_len is always 0 anyway but let's make the
+    return more explicit.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit ffe35b6c2566fc2a3f418185a61a12c7f377affd
+Author: Terry Lambert <tlambert@chromium.org>
+Date:   Fri Jul 15 17:23:20 2011 -0700
+
+    xf86-input-evdev: Return proper default for unknown values in pInfo->device_control.
+    
+    Signed-off-by: Terry Lambert <tlambert@chromium.org>
+    Reviewed-by: Stephane Marchesin <marcheu@chromium.org>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 5069e053354ad6adfcbb08c962bff93b607dec3d
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri May 27 16:20:03 2011 +1000
+
+    Remove unused misc_label and val
+    
+    evdev.c: In function 'EvdevInitAxesLabels':
+    evdev.c:2192:11: warning: variable 'misc_label' set but not used
+    [-Wunused-but-set-variable]
+    obsolete with 880ad1e19afd83ac115948b67d4049e16cb12df0
+    
+    emuWheel.c: In function 'EvdevWheelEmuPreInit':
+    emuWheel.c:252:10: warning: variable 'val' set but not used
+    [-Wunused-but-set-variable]
+    obsolete with b0737bdbd1f6e601eb4984b6f4cb49279190984c
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Daniel Stone <daniel@fooishbar.org>
+
+commit 0b9fad23a3d464ac064521d0e29f036b0ffdc9b8
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri May 27 16:17:12 2011 +1000
+
+    Print abs axes ranges on verbosity 6.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Daniel Stone <daniel@fooishbar.org>
+
+commit b79776cf8caa2b8db2984177661698da862befa6
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed Jun 15 10:22:39 2011 +1000
+
+    Require server 1.10
+    
+    We require ABI 12.2 in the driver, enforce it through pkg-config.
+    Technically ABI 12.2 is first available in 1.9.99.902 but 1.10 looks so much
+    nicer.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Daniel Stone <daniel@fooishbar.org>
+
+commit a52cd1cab2ae84442758de5155c5ec1417a7d16d
+Author: Daniel Kurtz <djkurtz@google.com>
+Date:   Tue Jun 14 18:09:00 2011 +0800
+
+    Set prop_product_id undeletable
+    
+    prop_invert was accidentally being set undeletable twice.
+    
+    Signed-off-by: Daniel Kurtz <djkurtz@google.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit eaf202531f2bb2b3da6d4769769f76da5489ae68
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Mon Jan 31 14:11:44 2011 +1000
+
+    Export device node as property.
+    
+    There is currently no mapping between XI devices and physical devices other
+    than what can be extracted by parsing the Xorg logfile. Add new property
+    "Device Node" to the driver to export the open device file.
+    
+    Server 1.11 and later standardises on this property name.
+    
+    The client is responsible for detecting if the device is on the same host
+    and converting the data into a more useful format (e.g. sysfs path).
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 74151b3c52d989208c6ec8acadadd9bcf063bcc5
+Author: Peter Korsgaard <jacmet@sunsite.dk>
+Date:   Tue May 24 09:44:05 2011 +0200
+
+    Handle touchscreens without BTN_TOUCH
+    
+    Some touchscreens (like the Lumio crystaltouch in single touch mode) send
+    BTN_LEFT rather than BTN_TOUCH:
+    
+    Input driver version is 1.0.1
+    Input device ID: bus 0x3 vendor 0x202e product 0x5 version 0x111
+    Input device name: "LUMIO Inc LUMIO CrystalTouch ver 1.1C"
+    Supported events:
+      Event type 0 (Sync)
+      Event type 1 (Key)
+        Event code 272 (LeftBtn)
+        Event code 273 (RightBtn)
+        Event code 274 (MiddleBtn)
+      Event type 2 (Relative)
+        Event code 9 (Misc)
+      Event type 3 (Absolute)
+        Event code 0 (X)
+          Value    650
+          Min        0
+          Max     4095
+        Event code 1 (Y)
+          Value   3221
+          Min        0
+          Max     4095
+      Event type 4 (Misc)
+        Event code 4 (ScanCode)
+    Testing ... (interrupt to exit)
+    Event: time 1305882024.934011, type 4 (Misc), code 4 (ScanCode), value 90001
+    Event: time 1305882024.934017, type 1 (Key), code 272 (LeftBtn), value 1
+    Event: time 1305882024.934029, type 3 (Absolute), code 0 (X), value 270
+    Event: time 1305882024.934034, type 3 (Absolute), code 1 (Y), value 1513
+    Event: time 1305882024.934039, type 2 (Relative), code 9 (Misc), value 1
+    
+    This causes evdev to handle these device as a mouse rather than a
+    touchscreen, which naturally doesn't work very well. We already internally
+    translate BTN_TOUCH as BTN_LEFT, so accept this kind of devices as
+    touchscreens by checking for devices with BTN_LEFT, absolute X/Y and NO
+    relative X/Y axes.
+    
+    Signed-off-by: Peter Korsgaard <jacmet@sunsite.dk>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit e9d96e87acbd79b22837ac4b225ceb0bd0e1942e
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed May 18 12:20:19 2011 +1000
+
+    Add a property to toggle function key mode
+    
+    On some keyboards, the multimedia function keys are overlaid with the F
+    keys. This property enables clients to switch the primary mode of these F
+    keys between function keys and multimedia keys.
+    Some keyboards provide an Fn key to toggle between the modes. This is
+    hardware-specific and may or may not work on any given keyboard device.
+    
+    The current imlementation is only hooked up to apple keyboards.
+    The kernel provides a tweak to enable/disable.
+    
+    /sys/module/hid_apple/parameters/fnmode
+        0 .. keyboard sends Fx keys, Fn disabled
+        1 .. keyboard sends multimedia keys, Fn toggles to function keys
+        2 .. keyboard sends function keys, Fn toggles to multimedia keys
+    
+    If fnmode is on 0, we force it to 2.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Michel Dänzer <michel@daenzer.net>
+
+commit bb15bac149411a2066eca6ddd50e2ca2cc38f7c8
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed May 18 12:20:00 2011 +1000
+
+    Export product/vendor ID through a property.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Daniel Stone <daniel@fooishbar.org>
+
+commit 7611d2fc7357c44f56fed174d90681d5128f99e3
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed May 18 12:19:24 2011 +1000
+
+    Move invert variable to the block it is used in.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Daniel Stone <daniel@fooishbar.org>
+
+commit ebe41bfba77ba9c95d990d47d5e8f5a8a4f7477e
+Author: Chase Douglas <chase.douglas@canonical.com>
+Date:   Fri Apr 15 12:14:03 2011 -0400
+
+    Copy out of proximity values into current values selectively
+    
+    Otherwise, an event that causes us to go into proximity with some new
+    valuator values will retain some old valuator values from when last in
+    proximity. This change ensures that all values posted while out of
+    proximity are accounted for.
+    
+    Signed-off-by: Chase Douglas <chase.douglas@canonical.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 68a6a18fc2fe1d95c9196c1948a27f9e95029bec
+Author: Chase Douglas <chase.douglas@canonical.com>
+Date:   Mon Apr 4 09:40:14 2011 -0400
+
+    Ensure all known valuator values are stored when out of proximity
+    
+    The current code overwrites *all* the stored axis values with whatever
+    came in from evdev. Evdev is a stateful protocol, so it only sends us
+    updates to the axis values that have changed. We need to only update
+    the values that have changed.
+    
+    Signed-off-by: Chase Douglas <chase.douglas@canonical.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit eeacd3e5a8bbd797776f27e18d8ed68aa95a8823
+Author: Chase Douglas <chase.douglas@canonical.com>
+Date:   Mon Apr 4 09:40:13 2011 -0400
+
+    Ensure events are posted when entering into proximity
+    
+    Fixes LP: #736829 (https://bugs.launchpad.net/bugs/573006)
+    
+    Re-fixes old X.Org Bug 29645
+    <http://bugs.freedesktop.org/show_bug.cgi?id=29645>
+    
+    Signed-off-by: Chase Douglas <chase.douglas@canonical.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 5708e384942a7257257fbae8b1d64548fd6559a0
+Author: Simon Thum <simon.thum@gmx.de>
+Date:   Sun Mar 20 15:49:48 2011 +0100
+
+    rename valuator init functions
+    
+    Since the mode of valuators (no longer?) bears a relation to the device class
+    actually initialized, this naming was quite misleading.
+    
+    Signed-off-by: Simon Thum <simon.thum@gmx.de>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 41111ce1efc6181b8da042c5b01f01cdf92315be
+Author: Rami Ylimäki <rami.ylimaki@vincit.fi>
+Date:   Tue Mar 8 11:23:47 2011 +0200
+
+    Remove constness of device filename to avoid warning when freed.
+    
+    A warning from free() can be avoided by casting the constness away
+    from its argument pointer or by not declaring the pointer as const in
+    the first place.
+    
+    Signed-off-by: Rami Ylimäki <rami.ylimaki@vincit.fi>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit b4c47d5f9454a708a5ab161c015646f2ca6e1ac3
+Author: Rami Ylimäki <rami.ylimaki@vincit.fi>
+Date:   Tue Mar 8 11:23:46 2011 +0200
+
+    Release leaked device identifier on input device disconnect.
+    
+    Signed-off-by: Rami Ylimäki <rami.ylimaki@vincit.fi>
+    Reviewed-by: Erkki Seppälä <erkki.seppala@vincit.fi>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 50193a0dd35b6f54499fb76ab68f615237cc51f9
+Author: Rami Ylimäki <rami.ylimaki@vincit.fi>
+Date:   Tue Mar 8 11:23:45 2011 +0200
+
+    Release leaked XKB options on input device disconnect.
+    
+    Currently the XKB options duplicated in EvdevAddKeyClass are never
+    released. For example, connecting and disconnecting a bluetooth
+    keyboard repeatedly causes a steadily growing memory leak.
+    
+    Signed-off-by: Rami Ylimäki <rami.ylimaki@vincit.fi>
+    Reviewed-by: Erkki Seppälä <erkki.seppala@vincit.fi>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 0049cce4d0691f055dfe9059e4c0c4ad30301db6
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Feb 11 13:31:52 2011 +1000
+
+    Use Absolute/Relative as argument to xf86Post*
+    
+    xf86Post* takes an int for the is_absolute parameter. Since the XI protocol
+    spec requires Relative to be 0 and Absolute to be 1, use those instead to
+    make the code easier to read.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit d9001a6be9d86a5f30549af9fbb02a466f4b0709
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed Jan 26 12:11:00 2011 +1000
+
+    Add third button emulation.
+    
+    New properties:
+    "Evdev Third Button Emulation" → switch on/off
+    "Evdev Third Button Emulation Timeout" → timeout until event is delivered
+    "Evdev Third Button Emulation Button" → phys button to be emulated
+    "Evdev Third Button Emulation Threshold" → move threshold before emulation
+    is cancelled
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Tested-by: Benjamin Tissoires <tissoire@cena.fr>
+
+commit 22db196815b813ff1c4806dd4cbb06788763d6b6
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Mon Jan 31 13:39:46 2011 +1000
+
+    Static atoms don't need to be initialized to 0.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 54ac2306b83434a014e941e25a5286a592e74351
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Mon Jan 31 12:07:48 2011 +1000
+
+    Replace xf86Msg() with xf86IDrvMsg().
+    
+    The latter provides a standardised message format in the form of
+        driver name: device name: message
+    
+    making it easier to grep for driver messages in the log.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 768c25a99b2f4ec07993eb15a0f05a5e22b5c695
+Author: Chase Douglas <chase.douglas@canonical.com>
+Date:   Mon Jan 24 11:49:05 2011 -0500
+
+    Add support for masked valuators
+    
+    With the X server now supporting masked valuators for XI2, enable
+    support in X evdev.
+    
+    Signed-off-by: Chase Douglas <chase.douglas@canonical.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit b5c9f41b2b6c680b7c44eadef8da855b1d9adcb7
+Author: Chase Douglas <chase.douglas@canonical.com>
+Date:   Sat Jan 22 16:40:49 2011 -0500
+
+    Switch to "goto" logic for error handling when adding classes
+    
+    This will be necessary for the addition of multitouch functionality.
+    
+    Signed-off-by: Chase Douglas <chase.douglas@canonical.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 8bc4be3048754b9c751cd98f5a5b46cf59a56f3a
+Author: Chase Douglas <chase.douglas@canonical.com>
+Date:   Sat Jan 22 16:40:48 2011 -0500
+
+    Remove support for X input ABI < 12.2
+    
+    Signed-off-by: Chase Douglas <chase.douglas@canonical.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
 commit 30c3645e20e945b0f8b7dc624748948464be606e
 Author: Peter Hutterer <peter.hutterer@who-t.net>
 Date:   Tue Jan 11 12:46:40 2011 +1000

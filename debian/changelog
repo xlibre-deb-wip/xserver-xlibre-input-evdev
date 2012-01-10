@@ -2,8 +2,10 @@ xserver-xorg-input-evdev (1:2.6.99.901-1ubuntu1) UNRELEASED; urgency=low
 
   * Add patch to set default resolution to 0
     - 0002-default-resolution.patch
+  * Fix touch valuators
+    - 0003-copy-mt-vals.patch
 
- -- Chase Douglas <chase.douglas@ubuntu.com>  Tue, 10 Jan 2012 11:29:29 +0100
+ -- Chase Douglas <chase.douglas@ubuntu.com>  Tue, 10 Jan 2012 11:33:24 +0100
 
 xserver-xorg-input-evdev (1:2.6.99.901-1) experimental; urgency=low
 

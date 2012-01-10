@@ -1,0 +1,203 @@
+From 93051a1a76c16f39193b3a4be72f5696b339e653 Mon Sep 17 00:00:00 2001
+From: Chase Douglas <chase.douglas@canonical.com>
+Date: Tue, 3 Jan 2012 17:08:05 -0800
+Subject: [PATCH v2 xf86-input-evdev] Copy last valuator values into new touch valuator masks
+
+Evdev is a 100% stateful protocol. The following represents three
+touches. Two touches begin and end at the same time at (500, 500) and
+(1000, 1000). The third touch begins after the first two end, and is at
+(500, 500).
+
+ABS_MT_SLOT		0	/* Set touch slot */
+ABS_MT_TRACKING_ID	0	/* New touch with ID 0 in slot 0 */
+ABS_MT_POSITION_X	500	/* Initial X position */
+ABS_MT_POSITION_Y	500	/* Initial Y position */
+ABS_MT_SLOT		1	/* Set touch slot */
+ABS_MT_TRACKING_ID	1	/* New touch with ID 1 in slot 1 */
+ABS_MT_POSITION_X	1000	/* Initial X position */
+ABS_MT_POSITION_Y	1000	/* Initial Y position */
+SYNC				/* End of frame */
+ABS_MT_SLOT		0	/* Go back to slot 0 */
+ABS_MT_TRACKING_ID	-1	/* Touch in slot 0 ended */
+ABS_MT_SLOT		1	/* Go to slot 1 */
+ABS_MT_TRACKING_ID	-1	/* Touch in slot 1 ended */
+SYNC				/* End of frame */
+ABS_MT_SLOT		0	/* Go back to slot 0 */
+ABS_MT_TRACKING_ID	2	/* New touch in slot 0 with ID 2 */
+SYNC				/* End of frame */
+ABS_MT_TRACKING_ID	-1	/* Touch in last slot (0) ended */
+SYNC				/* End of frame */
+
+Note that touch 2 has the same X and Y position as touch 0. This is
+implied because no new value was emitted for slot 0. In fact, Linux will
+not emit an event in the same slot with the same event type and code
+unless the value has changed. Thus, we can only assume that all the MT
+valuators have the same values as they were when they were last sent for
+the given slot.
+
+This change adds an array of valuator mask to hold all the last valuator
+values that came from evdev for each slot. When a new touch begins, all
+the last values are copied into it.
+
+This patch assumes initial axis values of 0 in each slot. Linux and
+mtdev do not provide a facility to query the current values of axes in
+each slot yet. This may cause spurious incorrect touch valuator values
+at the beginning of an X session, but there's nothing we can do about it
+right now.
+
+Signed-off-by: Chase Douglas <chase.douglas@canonical.com>
+---
+Changes since v1:
+* Hold the last values *per-slot* instead of globally
+
+ src/evdev.c |   80 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ src/evdev.h |    1 +
+ 2 files changed, 77 insertions(+), 4 deletions(-)
+
+diff --git a/src/evdev.c b/src/evdev.c
+index 82cdb00..ec6650e 100644
+--- a/src/evdev.c
++++ b/src/evdev.c
+@@ -746,6 +746,24 @@ EvdevProcessTouch(InputInfoPtr pInfo)
+     valuator_mask_zero(pEvdev->mt_mask);
+ }
+ 
++static int
++num_slots(EvdevPtr pEvdev)
++{
++    int value = pEvdev->absinfo[ABS_MT_SLOT].maximum -
++                pEvdev->absinfo[ABS_MT_SLOT].minimum + 1;
++
++    /* If we don't know how many slots there are, assume at least 10 */
++    return value > 1 ? value : 10;
++}
++
++static int
++last_mt_vals_slot(EvdevPtr pEvdev)
++{
++    int value = pEvdev->cur_slot - pEvdev->absinfo[ABS_MT_SLOT].minimum;
++
++    return value < num_slots(pEvdev) ? value : -1;
++}
++
+ static void
+ EvdevProcessTouchEvent(InputInfoPtr pInfo, struct input_event *ev)
+ {
+@@ -757,16 +775,29 @@ EvdevProcessTouchEvent(InputInfoPtr pInfo, struct input_event *ev)
+         pEvdev->cur_slot = ev->value;
+     } else
+     {
++        int slot_index = last_mt_vals_slot(pEvdev);
++
+         if (pEvdev->slot_state == SLOTSTATE_EMPTY)
+             pEvdev->slot_state = SLOTSTATE_UPDATE;
+         if (ev->code == ABS_MT_TRACKING_ID) {
+-        if (ev->value >= 0)
+-            pEvdev->slot_state = SLOTSTATE_OPEN;
+-        else
+-            pEvdev->slot_state = SLOTSTATE_CLOSE;
++            if (ev->value >= 0) {
++                pEvdev->slot_state = SLOTSTATE_OPEN;
++
++                if (slot_index >= 0)
++                    valuator_mask_copy(pEvdev->mt_mask,
++                        pEvdev->last_mt_vals[slot_index]);
++                else
++                    xf86IDrvMsg(pInfo, X_WARNING,
++                                "Attempted to copy values from out-of-range "
++                                "slot, touch events may be incorrect.\n");
++            } else
++                pEvdev->slot_state = SLOTSTATE_CLOSE;
+         } else {
+             map = pEvdev->axis_map[ev->code];
+             valuator_mask_set(pEvdev->mt_mask, map, ev->value);
++            if (slot_index >= 0)
++                valuator_mask_set(pEvdev->last_mt_vals[slot_index], map,
++                                  ev->value);
+         }
+     }
+ }
+@@ -1256,6 +1287,24 @@ EvdevAddAbsValuatorClass(DeviceIntPtr device)
+             goto out;
+         }
+ 
++        pEvdev->last_mt_vals = calloc(num_slots(pEvdev), sizeof(ValuatorMask *));
++        if (!pEvdev->last_mt_vals) {
++            xf86Msg(X_ERROR,
++                    "%s: failed to allocate MT last values mask array.\n",
++                    device->name);
++            goto out;
++        }
++
++        for (i = 0; i < num_slots(pEvdev); i++) {
++            pEvdev->last_mt_vals[i] = valuator_mask_new(num_mt_axes_total);
++            if (!pEvdev->last_mt_vals[i]) {
++                xf86Msg(X_ERROR,
++                        "%s: failed to allocate MT last values mask.\n",
++                        device->name);
++                goto out;
++            }
++        }
++
+         for (i = 0; i < EVDEV_MAXQUEUE; i++) {
+             pEvdev->queue[i].touchMask =
+                 valuator_mask_new(num_mt_axes_total);
+@@ -1318,6 +1367,17 @@ EvdevAddAbsValuatorClass(DeviceIntPtr device)
+                     device->name);
+             goto out;
+         }
++
++        for (i = 0; i < num_slots(pEvdev); i++) {
++            for (axis = ABS_MT_TOUCH_MAJOR; axis < ABS_MAX; axis++) {
++                if (pEvdev->axis_map[axis] >= 0) {
++                    /* XXX: read initial values from mtdev when it adds support
++                     *      for doing so. */
++                    valuator_mask_set(pEvdev->last_mt_vals[i],
++                                      pEvdev->axis_map[axis], 0);
++                }
++            }
++        }
+     }
+ #endif
+ 
+@@ -1428,6 +1488,12 @@ out:
+     valuator_mask_free(&pEvdev->prox);
+ #ifdef MULTITOUCH
+     valuator_mask_free(&pEvdev->mt_mask);
++    if (pEvdev->last_mt_vals) {
++        for (i = 0; i < num_slots(pEvdev); i++)
++            valuator_mask_free(&pEvdev->last_mt_vals[i]);
++        free(pEvdev->last_mt_vals);
++        pEvdev->last_mt_vals = NULL;
++    }
+     for (i = 0; i < EVDEV_MAXQUEUE; i++)
+         valuator_mask_free(&pEvdev->queue[i].touchMask);
+ #endif
+@@ -1808,6 +1874,12 @@ EvdevProc(DeviceIntPtr device, int what)
+         valuator_mask_free(&pEvdev->prox);
+ #ifdef MULTITOUCH
+         valuator_mask_free(&pEvdev->mt_mask);
++        if (pEvdev->last_mt_vals) {
++            for (i = 0; i < num_slots(pEvdev); i++)
++                valuator_mask_free(&pEvdev->last_mt_vals[i]);
++            free(pEvdev->last_mt_vals);
++            pEvdev->last_mt_vals = NULL;
++        }
+         for (i = 0; i < EVDEV_MAXQUEUE; i++)
+             valuator_mask_free(&pEvdev->queue[i].touchMask);
+         if (pEvdev->mtdev)
+diff --git a/src/evdev.h b/src/evdev.h
+index 1713b89..309b215 100644
+--- a/src/evdev.h
++++ b/src/evdev.h
+@@ -158,6 +158,7 @@ typedef struct {
+     ValuatorMask *old_vals; /* old values for calculating relative motion */
+     ValuatorMask *prox;     /* last values set while not in proximity */
+     ValuatorMask *mt_mask;
++    ValuatorMask **last_mt_vals;
+     int cur_slot;
+     enum SlotState slot_state;
+ #ifdef MULTITOUCH
+-- 
+1.7.7.3
+

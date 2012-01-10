@@ -9,15 +9,15 @@ Build-Depends:
  dh-autoreconf,
  pkg-config,
  quilt,
- xserver-xorg-dev (>= 2:1.11.2.902-1ubuntu1),
+ xserver-xorg-dev (>= 2:1.11.3-0ubuntu1),
  x11proto-core-dev,
  x11proto-randr-dev,
- x11proto-input-dev (>= 2.1.99.4),
+ x11proto-input-dev (>= 2.1.99.3),
  x11proto-kb-dev,
  libxkbfile-dev,
  xutils-dev (>= 1:7.5+4),
- libmtdev-dev,
  libudev-dev,
+ libmtdev-dev,
 Standards-Version: 3.9.1
 Vcs-Git: git://git.debian.org/git/pkg-xorg/driver/xserver-xorg-input-evdev
 Vcs-Browser: http://git.debian.org/?p=pkg-xorg/driver/xserver-xorg-input-evdev.git

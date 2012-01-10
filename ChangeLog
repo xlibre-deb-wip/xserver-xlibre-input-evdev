@@ -1,3 +1,75 @@
+commit 4b76d80e934f5503c712289ce73d4e10cc79bba6
+Author: Cyril Brulebois <kibi@debian.org>
+Date:   Sat Dec 31 18:38:30 2011 +0100
+
+    evdev 2.6.99.901
+    
+    Signed-off-by: Cyril Brulebois <kibi@debian.org>
+
+commit 6dd6f2d3c6b2fee5f78b01618643c7f3ed0819c3
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu Dec 29 10:37:38 2011 +1000
+
+    Require xserver 1.12 RC1
+    
+    Remove the ABI check hack, just check for the server version directly now
+    that we have one that definitely has the multitouch APIs.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 0c7c087f77132657dd8ee342963bb1b51d659571
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu Dec 29 10:19:48 2011 +1000
+
+    Test for mtdev before assuming multitouch
+    
+    If the XI2.2 headers are present but mtdev isn't, build without MULTITOUCH
+    defined.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit ba9377c6d9e6d0d2813e471b516bb36902dae2ce
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Sat Dec 24 12:19:40 2011 +1000
+
+    Remove need for --enable-multitouch
+    
+    If we spot inputproto 2.1.99.3, we assume we have a capable X server. This
+    should really be a server version check, but the server version hasn't been
+    bumped yet.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 7f7606fc461dca1f087a756c85e22f2cc773d008
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Sat Dec 24 12:31:34 2011 +1000
+
+    Include config.h from evdev.h
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 0ba58f483e564bd815bae36f6272029693c1fd5c
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Sat Dec 24 12:18:16 2011 +1000
+
+    Always include mt_mask in the evdev struct
+    
+    Even if MT support isn't available, include it in the build. The checks in
+    the code check whether mt_mask is non-NULL but they would all need ifdef
+    escaping otherwise.
+    
+    Leave the mtdev part inside the ifdef however, so that we don't need the
+    mtdev header if we don't build with multitouch.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 5fb48757477b2effd69c8fe8722ad95b21dbf7f5
+Merge: 7909975 e99ab23
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Dec 23 08:16:54 2011 +1000
+
+    Merge branch 'multitouch'
+
 commit e99ab2314f712df8dd705b16008755f8b3095707
 Author: Peter Hutterer <peter.hutterer@who-t.net>
 Date:   Tue Dec 20 15:08:06 2011 +1000
@@ -43,6 +115,35 @@ Date:   Tue Dec 20 10:56:22 2011 +1000
     MT axes are the same as traditional axes, so one into the other so we get
     x/y coordinates regardless wich axes it comes from.
     
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 7909975b0b965fbf0935bf012987a5368ea0e67a
+Author: Paulo Zanoni <paulo.r.zanoni@intel.com>
+Date:   Thu Dec 15 12:26:37 2011 -0200
+
+    Fix relative events with swapped axes
+    
+    After we swap the axes, we only call valuator_mask_set for axes that are
+    not zero, so we need to unset the axes that became zero when swapped.
+    
+    Signed-off-by: Paulo Zanoni <paulo.r.zanoni@intel.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 8d6dfd13b0c4177305555294218e366a6cddc83f
+Author: Paulo Zanoni <paulo.r.zanoni@intel.com>
+Date:   Wed Dec 14 15:23:36 2011 -0200
+
+    Fix absolute events with swapped axes
+    
+    We were correctly swapping the valuator values, but we were not
+    calling valuator_mask_unset() when needed, so the cursor kept jumping
+    to the edges.
+    
+    This patch does the swapping before the main "for", so we don't need to
+    store unswapped_{x,y} and unswapped_isset_{x,y} even when we don't need
+    to swap.
+    
+    Signed-off-by: Paulo Zanoni <paulo.r.zanoni@intel.com>
     Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
 
 commit fed454192ddc4ad94226040c657deb6abea3df88

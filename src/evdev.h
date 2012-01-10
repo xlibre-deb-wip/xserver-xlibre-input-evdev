@@ -28,6 +28,10 @@
  *	Oliver McFadden (oliver.mcfadden@nokia.com)
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #ifndef EVDEV_H
 #define EVDEV_H
 
@@ -153,10 +157,10 @@ typedef struct {
     ValuatorMask *vals;     /* new values coming in */
     ValuatorMask *old_vals; /* old values for calculating relative motion */
     ValuatorMask *prox;     /* last values set while not in proximity */
-#ifdef MULTITOUCH
     ValuatorMask *mt_mask;
     int cur_slot;
     enum SlotState slot_state;
+#ifdef MULTITOUCH
     struct mtdev *mtdev;
 #endif
 

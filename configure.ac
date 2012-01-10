@@ -23,7 +23,7 @@
 # Initialize Autoconf
 AC_PREREQ([2.60])
 AC_INIT([xf86-input-evdev],
-        [2.6.99],
+        [2.6.99.901],
         [https://bugs.freedesktop.org/enter_bug.cgi?product=xorg],
         [xf86-input-evdev])
 AC_CONFIG_SRCDIR([Makefile.am])
@@ -48,18 +48,14 @@ XORG_DEFAULT_OPTIONS
 PKG_CHECK_MODULES(XORG, [xorg-server >= 1.10] xproto inputproto)
 PKG_CHECK_MODULES(UDEV, udev)
 
-# Whether to include support for experimental XI 2.2 multitouch
-AC_ARG_ENABLE(multitouch,
-              AC_HELP_STRING([--enable-multitouch],
-                             [Enable experimental XI 2.2 multitouch support [[default: disabled]]]),
-              [MULTITOUCH=$enableval],
-              [MULTITOUCH=no])
+PKG_CHECK_MODULES(XI22, [inputproto >= 2.1.99.3] [xorg-server >= 1.11.99.901], HAVE_XI22="yes", HAVE_XI22="no")
 
-if test "x$MULTITOUCH" = xyes; then
-        AC_DEFINE(MULTITOUCH, 1, [Enable experimental multitouch code])
-
+if test "x$HAVE_XI22" = xyes; then
         # Obtain compiler/linker options for mtdev
-        PKG_CHECK_MODULES(MTDEV, mtdev)
+        PKG_CHECK_MODULES(MTDEV, mtdev, HAVE_MTDEV="yes", HAVE_MTDEV="no")
+fi
+if test "x$HAVE_XI22" = xyes && test "x$HAVE_MTDEV" = xyes; then
+        AC_DEFINE(MULTITOUCH, 1, [XI2.2 available])
 fi
 
 # Define a configure option for an alternate input module directory

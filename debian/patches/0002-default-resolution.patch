@@ -1,0 +1,40 @@
+From 8c55e94a6ac91fa856d37206c8a7eda1adcc6b9d Mon Sep 17 00:00:00 2001
+From: Chase Douglas <chase.douglas@canonical.com>
+Date: Tue, 03 Jan 2012 23:31:43 +0000
+Subject: Set the default resolution to 0
+
+If we don't know the resolution, set it to 0. This is invalid, and tells
+the X client that we don't know the resolution, rather than reporting an
+incorrect value.
+
+This value was originally from commit
+6271494faa4c45f4fa10509f72e0515f2cef36c6, which is the initial commit
+from Adam Jackson adding absolute axis support.
+
+Signed-off-by: Chase Douglas <chase.douglas@canonical.com>
+Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+---
+diff --git a/src/evdev.c b/src/evdev.c
+index 9f3a22a..82cdb00 100644
+--- a/src/evdev.c
++++ b/src/evdev.c
+@@ -1323,7 +1323,7 @@ EvdevAddAbsValuatorClass(DeviceIntPtr device)
+ 
+     for (axis = ABS_X; axis < ABS_MT_SLOT; axis++) {
+         int axnum = pEvdev->axis_map[axis];
+-        int resolution = 10000;
++        int resolution = 0;
+ 
+         if (axnum == -1)
+             continue;
+@@ -1345,7 +1345,7 @@ EvdevAddAbsValuatorClass(DeviceIntPtr device)
+ #ifdef MULTITOUCH
+     for (axis = ABS_MT_TOUCH_MAJOR; axis <= ABS_MAX; axis++) {
+         int axnum = pEvdev->axis_map[axis];
+-        int resolution = 10000;
++        int resolution = 0;
+         int j;
+         BOOL skip = FALSE;
+ 
+--
+cgit v0.9.0.2-2-gbebe

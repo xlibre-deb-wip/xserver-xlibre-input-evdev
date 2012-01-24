@@ -1,0 +1,92 @@
+From 5c5b2c8db851df7921cedd888222a6630a007fd8 Mon Sep 17 00:00:00 2001
+From: Peter Hutterer <peter.hutterer@who-t.net>
+Date: Thu, 12 Jan 2012 01:03:30 +0000
+Subject: Force x/y axes to exist on devices with any other axes (#44655)
+
+Too much in the server relies on x/y to exist and to be axes 0 and 1. So if
+any relative axes exist, initialize REL_X/Y or ABS_X/Y as well.
+
+For servers up to 1.11: a scrollwheel-only device now has relative axes
+where it only had buttons before.
+
+For servers 1.12 or later: the device now has x/y in addition to the scroll
+axes.
+
+X.Org Bug 44655 <http://bugs.freedesktop.org/show_bug.cgi?id=44655>
+
+Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
+Reviewed-by: Daniel Stone <daniel@fooishbar.org>
+---
+diff --git a/src/evdev.c b/src/evdev.c
+index 989a255..effac40 100644
+--- a/src/evdev.c
++++ b/src/evdev.c
+@@ -1958,6 +1958,38 @@ EvdevGrabDevice(InputInfoPtr pInfo, int grab, int ungrab)
+     return TRUE;
+ }
+ 
++/**
++ * Some devices only have other axes (e.g. wheels), but we
++ * still need x/y for these. The server relies on devices having
++ * x/y as axes 0/1 and core/XI 1.x clients expect it too (#44655)
++ */
++static void
++EvdevForceXY(InputInfoPtr pInfo, int mode)
++{
++    EvdevPtr pEvdev = pInfo->private;
++
++    xf86IDrvMsg(pInfo, X_INFO, "Forcing %s x/y axes to exist.\n",
++                (mode == Relative) ? "relative" : "absolute");
++
++    if (mode == Relative)
++    {
++        EvdevSetBit(pEvdev->rel_bitmask, REL_X);
++        EvdevSetBit(pEvdev->rel_bitmask, REL_Y);
++    } else if (mode == Absolute)
++    {
++        EvdevSetBit(pEvdev->abs_bitmask, ABS_X);
++        EvdevSetBit(pEvdev->abs_bitmask, ABS_Y);
++        pEvdev->absinfo[ABS_X].minimum = 0;
++        pEvdev->absinfo[ABS_X].maximum = 1000;
++        pEvdev->absinfo[ABS_X].value = 0;
++        pEvdev->absinfo[ABS_X].resolution = 0;
++        pEvdev->absinfo[ABS_Y].minimum = 0;
++        pEvdev->absinfo[ABS_Y].maximum = 1000;
++        pEvdev->absinfo[ABS_Y].value = 0;
++        pEvdev->absinfo[ABS_Y].resolution = 0;
++    }
++}
++
+ static int
+ EvdevProbe(InputInfoPtr pInfo)
+ {
+@@ -2051,7 +2083,8 @@ EvdevProbe(InputInfoPtr pInfo)
+             if (EvdevBitIsSet(pEvdev->rel_bitmask, REL_X) &&
+                 EvdevBitIsSet(pEvdev->rel_bitmask, REL_Y)) {
+                 xf86IDrvMsg(pInfo, X_PROBED, "Found x and y relative axes\n");
+-            }
++            } else
++                EvdevForceXY(pInfo, Relative);
+         } else {
+             xf86IDrvMsg(pInfo, X_INFO, "Relative axes present but ignored.\n");
+             has_rel_axes = FALSE;
+@@ -2116,7 +2149,16 @@ EvdevProbe(InputInfoPtr pInfo)
+                     pEvdev->flags |= EVDEV_TOUCHSCREEN;
+                     pEvdev->flags |= EVDEV_BUTTON_EVENTS;
+             }
++        } else {
++#ifdef MULTITOUCH
++            if (!EvdevBitIsSet(pEvdev->abs_bitmask, ABS_MT_POSITION_X) ||
++                !EvdevBitIsSet(pEvdev->abs_bitmask, ABS_MT_POSITION_Y))
++#endif
++                EvdevForceXY(pInfo, Absolute);
+         }
++
++
++
+     }
+ 
+     for (i = 0; i < BTN_MISC; i++) {
+--
+cgit v0.9.0.2-2-gbebe

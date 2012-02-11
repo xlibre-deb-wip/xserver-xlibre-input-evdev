@@ -1,4 +1,4 @@
-xserver-xorg-input-evdev (1:2.6.99.901+git20120126-0ubuntu1) UNRELEASED; urgency=low
+xserver-xorg-input-evdev (1:2.6.99.901+git20120126-0ubuntu1) precise; urgency=low
 
   * Update to latest git snapshot (224a28d)
   * Drop patches merged upstream:
@@ -8,7 +8,7 @@ xserver-xorg-input-evdev (1:2.6.99.901+git20120126-0ubuntu1) UNRELEASED; urgency
     - 100-evdev-force-x-y-axes.patch
   * Bump standards version to 3.9.2
 
- -- Chase Douglas <chase.douglas@ubuntu.com>  Fri, 10 Feb 2012 18:06:42 -0800
+ -- Chase Douglas <chase.douglas@ubuntu.com>  Fri, 10 Feb 2012 18:08:07 -0800
 
 xserver-xorg-input-evdev (1:2.6.99.901-1ubuntu3) precise; urgency=low
 

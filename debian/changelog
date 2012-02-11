@@ -1,8 +1,13 @@
 xserver-xorg-input-evdev (1:2.6.99.901+git20120126-0ubuntu1) UNRELEASED; urgency=low
 
   * Update to latest git snapshot (224a28d)
+  * Drop patches merged upstream:
+    - 0001-configure.ac-Fix-udev-libudev-dependency.patch
+    - 0002-default-resolution.patch
+    - 0003-copy-mt-vals.patch
+    - 100-evdev-force-x-y-axes.patch
 
- -- Chase Douglas <chase.douglas@ubuntu.com>  Fri, 10 Feb 2012 17:02:27 -0800
+ -- Chase Douglas <chase.douglas@ubuntu.com>  Fri, 10 Feb 2012 17:10:46 -0800
 
 xserver-xorg-input-evdev (1:2.6.99.901-1ubuntu3) precise; urgency=low
 

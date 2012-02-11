@@ -1,5 +1,1 @@
-0001-configure.ac-Fix-udev-libudev-dependency.patch
-0002-default-resolution.patch
-0003-copy-mt-vals.patch
 0004-xi22-ubuntu.patch
-100-evdev-force-x-y-axes.patch

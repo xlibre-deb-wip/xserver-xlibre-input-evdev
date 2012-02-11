@@ -6,8 +6,9 @@ xserver-xorg-input-evdev (1:2.6.99.901+git20120126-0ubuntu1) UNRELEASED; urgency
     - 0002-default-resolution.patch
     - 0003-copy-mt-vals.patch
     - 100-evdev-force-x-y-axes.patch
+  * Bump standards version to 3.9.2
 
- -- Chase Douglas <chase.douglas@ubuntu.com>  Fri, 10 Feb 2012 17:10:46 -0800
+ -- Chase Douglas <chase.douglas@ubuntu.com>  Fri, 10 Feb 2012 18:06:42 -0800
 
 xserver-xorg-input-evdev (1:2.6.99.901-1ubuntu3) precise; urgency=low
 

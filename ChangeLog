@@ -1,3 +1,175 @@
+commit 224a28de25fda654040a9fd4e5c4d748c9e29809
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed Jan 25 16:03:34 2012 +1000
+
+    Only force REL_X/Y if no ABS_X/Y exists
+    
+    5c5b2c8db851df7921cedd888222a6630a007fd8 added forced x/y axes if a device
+    has any axes of the same mode. This was too broad a brush, some devices have
+    a relative wheel but absolute x/y axes and would now get misdetected as
+    purely relative device.
+    
+    Only force relative axes if a device no rel x/y _and_ no abs x/y.
+    
+    Reproducible: virtual machine with QEMU USB Tablet will stop working
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
+
+commit bc2f01ab838119a962f5e5eabb36e33d4c084f2c
+Author: Chase Douglas <chase.douglas@canonical.com>
+Date:   Thu Jan 19 14:17:34 2012 -0800
+
+    Copy last valuator values into new touch valuator masks
+    
+    Evdev is a 100% stateful protocol. The following represents three
+    touches. Two touches begin and end at the same time at (500, 500) and
+    (1000, 1000). The third touch begins after the first two end, and is at
+    (500, 500).
+    
+    ABS_MT_SLOT		0	/* Set touch slot */
+    ABS_MT_TRACKING_ID	0	/* New touch with ID 0 in slot 0 */
+    ABS_MT_POSITION_X	500	/* Initial X position */
+    ABS_MT_POSITION_Y	500	/* Initial Y position */
+    ABS_MT_SLOT		1	/* Set touch slot */
+    ABS_MT_TRACKING_ID	1	/* New touch with ID 1 in slot 1 */
+    ABS_MT_POSITION_X	1000	/* Initial X position */
+    ABS_MT_POSITION_Y	1000	/* Initial Y position */
+    SYNC				/* End of frame */
+    ABS_MT_SLOT		0	/* Go back to slot 0 */
+    ABS_MT_TRACKING_ID	-1	/* Touch in slot 0 ended */
+    ABS_MT_SLOT		1	/* Go to slot 1 */
+    ABS_MT_TRACKING_ID	-1	/* Touch in slot 1 ended */
+    SYNC				/* End of frame */
+    ABS_MT_SLOT		0	/* Go back to slot 0 */
+    ABS_MT_TRACKING_ID	2	/* New touch in slot 0 with ID 2 */
+    SYNC				/* End of frame */
+    ABS_MT_TRACKING_ID	-1	/* Touch in last slot (0) ended */
+    SYNC				/* End of frame */
+    
+    Note that touch 2 has the same X and Y position as touch 0. This is
+    implied because no new value was emitted for slot 0. In fact, Linux will
+    not emit an event in the same slot with the same event type and code
+    unless the value has changed. Thus, we can only assume that all the MT
+    valuators have the same values as they were when they were last sent for
+    the given slot.
+    
+    This change adds an array of valuator mask to hold all the last valuator
+    values that came from evdev for each slot. When a new touch begins, all
+    the last values are copied into it.
+    
+    This patch assumes initial axis values of 0 in each slot. Linux and
+    mtdev do not provide a facility to query the current values of axes in
+    each slot yet. This may cause spurious incorrect touch valuator values
+    at the beginning of an X session, but there's nothing we can do about it
+    right now.
+    
+    Signed-off-by: Chase Douglas <chase.douglas@canonical.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 9d9c9870c88f2c636799a68cde8efcab59a4a2a5
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Jan 13 09:51:36 2012 +1000
+
+    Prefere relative axis labelling over absolute axis labelling
+    
+    If a device has both relative and absolute axes, we'd initialise the
+    relative axes but label them with the absolute labels.
+    
+    The current code is broken for mixed mode devices. Most of these devices
+    operate primarily in relative mode, but have some absolute axes available
+    for secondary functionality. For now, label the relative axes properly. We
+    can fix the absolute axes later.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
+
+commit 5c5b2c8db851df7921cedd888222a6630a007fd8
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu Jan 12 11:03:30 2012 +1000
+
+    Force x/y axes to exist on devices with any other axes (#44655)
+    
+    Too much in the server relies on x/y to exist and to be axes 0 and 1. So if
+    any relative axes exist, initialize REL_X/Y or ABS_X/Y as well.
+    
+    For servers up to 1.11: a scrollwheel-only device now has relative axes
+    where it only had buttons before.
+    
+    For servers 1.12 or later: the device now has x/y in addition to the scroll
+    axes.
+    
+    X.Org Bug 44655 <http://bugs.freedesktop.org/show_bug.cgi?id=44655>
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
+    Reviewed-by: Daniel Stone <daniel@fooishbar.org>
+
+commit 854df75f4908bee66e1057f6f04817a1c47124bc
+Author: Pete Beardmore <pete.beardmore@msn.com>
+Date:   Mon Jan 9 23:47:45 2012 +0000
+
+    missing multitouch related define tests
+    
+    addition of two missing define tests required when no multitouch related
+    symbols are available in user-space
+    
+    Fixes X.Org Bug 44578 <https://bugs.freedesktop.org/show_bug.cgi?id=44578>
+    
+    Signed-off-by: Pete Beardmore <pete.beardmore@msn.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 8c55e94a6ac91fa856d37206c8a7eda1adcc6b9d
+Author: Chase Douglas <chase.douglas@canonical.com>
+Date:   Tue Jan 3 15:31:43 2012 -0800
+
+    Set the default resolution to 0
+    
+    If we don't know the resolution, set it to 0. This is invalid, and tells
+    the X client that we don't know the resolution, rather than reporting an
+    incorrect value.
+    
+    This value was originally from commit
+    6271494faa4c45f4fa10509f72e0515f2cef36c6, which is the initial commit
+    from Adam Jackson adding absolute axis support.
+    
+    Signed-off-by: Chase Douglas <chase.douglas@canonical.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 965338e9d0ee5e2a6135a930347e9dab4b8db0dd
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue Jan 3 08:44:27 2012 +1000
+
+    Remove unused udev.c
+    
+    Added in 683a55e504f4fc2d1c847c54986439a0c61b2f20 due to a botched up
+    rebase -i. The contents of udev.c and EvdevIsVirtual are identical, there is
+    no need for an extra file for this one function.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 0075da20d691e451f32bdf3c8ba0f270a6c8b0e1
+Author: Cyril Brulebois <kibi@debian.org>
+Date:   Sat Dec 31 19:46:08 2011 +0100
+
+    configure.ac: Fix udev/libudev dependency.
+    
+    In 683a55e504f4fc2d1c847c54986439a0c61b2f20, a dependency on libudev was
+    added, but documented in configure.ac as a dependency on udev (which
+    also happens to ship a pkg-config file).
+    
+    Signed-off-by: Cyril Brulebois <kibi@debian.org>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 009ac94a8e6d084c13f15ed8b2e1b22f86530c9f
+Author: Jeremy Huddleston <jeremyhu@apple.com>
+Date:   Sat Dec 31 21:28:53 2011 -0500
+
+    Remove redundant redeclaration of Evdev3BEmuPreInit
+    
+    Found-by: Tinderbox
+    Signed-off-by: Jeremy Huddleston <jeremyhu@apple.com>
+
 commit 4b76d80e934f5503c712289ce73d4e10cc79bba6
 Author: Cyril Brulebois <kibi@debian.org>
 Date:   Sat Dec 31 18:38:30 2011 +0100

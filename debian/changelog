@@ -1,3 +1,9 @@
+xserver-xorg-input-evdev (1:2.6.99.901+git20120126-0ubuntu1) UNRELEASED; urgency=low
+
+  * Update to latest git snapshot (224a28d)
+
+ -- Chase Douglas <chase.douglas@ubuntu.com>  Fri, 10 Feb 2012 17:02:27 -0800
+
 xserver-xorg-input-evdev (1:2.6.99.901-1ubuntu3) precise; urgency=low
 
   * Add 100-evdev-force-x-y-axes.patch: Fixes lp: #921236

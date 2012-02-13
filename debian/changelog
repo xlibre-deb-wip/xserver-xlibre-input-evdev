@@ -1,8 +1,8 @@
-xserver-xorg-input-evdev (1:2.6.99.901+git20120126-0ubuntu2) UNRELEASED; urgency=low
+xserver-xorg-input-evdev (1:2.6.99.901+git20120126-0ubuntu2) precise; urgency=low
 
   * Fix bad release commit for previous version
 
- -- Chase Douglas <chase.douglas@ubuntu.com>  Mon, 13 Feb 2012 17:08:07 +0100
+ -- Chase Douglas <chase.douglas@ubuntu.com>  Mon, 13 Feb 2012 17:09:14 +0100
 
 xserver-xorg-input-evdev (1:2.6.99.901+git20120126-0ubuntu1) precise; urgency=low
 

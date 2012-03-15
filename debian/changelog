@@ -2,8 +2,10 @@ xserver-xorg-input-evdev (1:2.7.0-0ubuntu1) UNRELEASED; urgency=low
 
   * New upstream release
     - No changes since last git snapshot
+  * Fix horizontal scroll direction (LP: #932439)
+    - Add 0005-fix-horiz-scrolling.patch from upstream
 
- -- Chase Douglas <chase.douglas@ubuntu.com>  Thu, 15 Mar 2012 08:31:47 -0700
+ -- Chase Douglas <chase.douglas@ubuntu.com>  Thu, 15 Mar 2012 08:36:17 -0700
 
 xserver-xorg-input-evdev (1:2.6.99.901+git20120126-0ubuntu2) precise; urgency=low
 

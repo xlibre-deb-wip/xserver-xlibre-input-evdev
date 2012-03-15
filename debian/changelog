@@ -1,3 +1,10 @@
+xserver-xorg-input-evdev (1:2.7.0-0ubuntu1) UNRELEASED; urgency=low
+
+  * New upstream release
+    - No changes since last git snapshot
+
+ -- Chase Douglas <chase.douglas@ubuntu.com>  Thu, 15 Mar 2012 08:31:47 -0700
+
 xserver-xorg-input-evdev (1:2.6.99.901+git20120126-0ubuntu2) precise; urgency=low
 
   * Fix bad release commit for previous version

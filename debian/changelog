@@ -1,3 +1,29 @@
+xserver-xorg-input-evdev (1:2.7.0-2) UNRELEASED; urgency=low
+
+  [ Maarten Lankhorst ]
+  * Bump build-dep to xorg 2:1.12.99.901
+  * Remove upstreamed 0001-configure.ac-Fix-udev-libudev-dependency.patch
+
+ -- Maarten Lankhorst <maarten.lankhorst@canonical.com>  Mon, 16 Jul 2012 13:24:29 +0200
+
+xserver-xorg-input-evdev (1:2.7.0-1) unstable; urgency=low
+
+  [ Timo Aaltonen ]
+  * Remove obsolete .manpages.
+
+  [ Cyril Brulebois ]
+  * New upstream release.
+  * Actually merge upstream master up to 99340147b9 (one extra commit) to
+    avoid inverted horizontal scroll.
+  * Don't merge from debian-experimental to avoid picking up XI2.2 fun:
+    too many bugs still need fixes so let's keep that for another day.
+    That would require a newer input proto package, along with a newer
+    server, anyway.
+  * Bump xserver-xorg-dev build-dep to 2:1.10, now required.
+  * Add libudev-dev build-dep.
+
+ -- Cyril Brulebois <kibi@debian.org>  Tue, 20 Mar 2012 00:40:39 +0000
+
 xserver-xorg-input-evdev (1:2.7.0-0ubuntu2) quantal; urgency=low
 
   * Fix crash due to axis label overrun (LP: #973297)

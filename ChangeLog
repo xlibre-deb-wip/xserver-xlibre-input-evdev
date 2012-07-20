@@ -1,3 +1,16 @@
+commit 99340147b9092a5aaec997eca407282a51e1f063
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu Mar 15 15:46:32 2012 +1000
+
+    Fix inverted horizontal scroll (#46205)
+    
+    REL_HWHEEL has a positive increment, not a negative one like REL_WHEEL.
+    
+    X.Org Bug 46205 <http://bugs.freedesktop.org/show_bug.cgi?id=46205>
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
+
 commit 76b1d58a9791257fa8b4e6d3322fcb082c86b18a
 Author: Peter Hutterer <peter.hutterer@who-t.net>
 Date:   Wed Mar 7 20:39:09 2012 +1000

@@ -1,8 +1,13 @@
-xserver-xorg-input-evdev (1:2.7.0-2) UNRELEASED; urgency=low
+xserver-xorg-input-evdev (1:2.7.0-2ubuntu1) UNRELEASED; urgency=low
 
   [ Maarten Lankhorst ]
   * Bump build-dep to xorg 2:1.12.99.901
-  * Remove upstreamed 0001-configure.ac-Fix-udev-libudev-dependency.patch
+  * Remove no longer needed patches:
+    - 0001-configure.ac-Fix-udev-libudev-dependency.patch
+    - 0004-xi22-ubuntu.patch
+  * I messed up the tree, manually unapply debian/patches/0005*
+    if you build directly from git, this will be fixed by
+    a new point release
 
  -- Maarten Lankhorst <maarten.lankhorst@canonical.com>  Mon, 16 Jul 2012 13:24:29 +0200
 

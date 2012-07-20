@@ -71,3 +71,22 @@ Description: X.Org X server -- evdev input driver (development headers)
  <URL:http://www.X.org>
  .
  This package is built from the X.org xf86-input-evdev driver module.
+
+Package: xserver-xorg-input-evdev-dbg
+Architecture: linux-any
+Depends:
+ ${misc:Depends},
+ xserver-xorg-input-evdev (= ${binary:Version}),
+Section: debug
+Priority: extra
+Description: X.Org X server -- evdev input driver (development headers)
+ This package provides the development headers for the evdev input driver
+ found in xserver-xorg-input-evdev. Non-developers likely have little use
+ for this package.
+ .
+ More information about X.Org can be found at:
+ <URL:http://www.X.org>
+ .
+ This package is built from the X.org xf86-input-evdev driver module.
+ .
+ This package provides debugging symbols for this Xorg X driver.

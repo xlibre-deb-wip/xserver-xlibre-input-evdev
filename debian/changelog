@@ -8,6 +8,10 @@ xserver-xorg-input-evdev (1:2.7.0-2~ubuntu1) UNRELEASED; urgency=low
   * Remove no longer needed patches:
     - 0004-xi22-ubuntu.patch
 
+  [ Timo Aaltonen ]
+  * control: Drop xserver-xorg-core from Depends, it's enough to depend on the
+    ABI version now.
+
  -- Maarten Lankhorst <maarten.lankhorst@canonical.com>  Mon, 16 Jul 2012 13:24:29 +0200
 
 xserver-xorg-input-evdev (1:2.7.0-2) UNRELEASED; urgency=low

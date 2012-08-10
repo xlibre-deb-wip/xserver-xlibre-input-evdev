@@ -1,4 +1,168 @@
-commit 99340147b9092a5aaec997eca407282a51e1f063
+commit f1ee12b9a363028c0d0a6668fca9eeb011f2354d
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Aug 3 16:00:31 2012 +1000
+
+    evdev 2.7.2
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 74690817fcd3e91ea384b8f311d8ce5626d8c409
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed Jul 4 09:14:41 2012 +1000
+
+    Don't re-open mtdev after PreInit
+    
+    ==16557== 388,240 (3,520 direct, 384,720 indirect) bytes in 10 blocks are definitely lost in loss record 1,669 of 1,671
+    ==16557==    at 0x4A06F18: calloc (vg_replace_malloc.c:566)
+    ==16557==    by 0xC3EAD4D: mtdev_new (core.c:345)
+    ==16557==    by 0xC3EAE6B: mtdev_new_open (core.c:383)
+    ==16557==    by 0xC1E0452: EvdevOpenDevice (evdev.c:2365)
+    ==16557==    by 0xC1E068C: EvdevPreInit (evdev.c:2431)
+    ==16557==    by 0x4B8304: xf86NewInputDevice (xf86Xinput.c:846)
+    ==16557==    by 0x4B8857: NewInputDeviceRequest (xf86Xinput.c:989)
+    ==16557==    by 0x4CCB4C: device_added (udev.c:211)
+    ==16557==    by 0x4CCFA6: config_udev_init (udev.c:342)
+    ==16557==    by 0x4CBE81: config_init (config.c:48)
+    ==16557==    by 0x4A8A9A: InitInput (xf86Init.c:918)
+    ==16557==    by 0x4921EE: main (main.c:258)
+    
+    After PreInit, the fd and mtdev pointer are still valid. We check for the
+    fd, but unconditionally allocated another mtdev struct for each device.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
+    (cherry picked from commit 98af2003d48530b2e102cf667a9d40dcb94cb0fe)
+
+commit b2cbbb178e9a3650118bdf498e678ca4e12062fe
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Mon May 28 10:08:23 2012 +1000
+
+    Constify InputDriverRec->default_options
+    
+    Removes a warning, and with the input ABI 18 this is forced to const in the
+    server.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
+    (cherry picked from commit 9624f4e2ba7d1973813de066806eed108748a53a)
+
+commit 7d91fc7bfcdaaac657aeb7b8876a4002ad0fa68d
+Author: Marcin Slusarz <marcin.slusarz@gmail.com>
+Date:   Mon May 21 01:22:33 2012 +0200
+
+    Fix some obvious constness-related compile warnings.
+    
+    Signed-off-by: Marcin Slusarz <marcin.slusarz@gmail.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    (cherry picked from commit 2c8da280b3ab635d049784345d025d289348687b)
+
+commit 09987eab9a77aa94127ecacca41498bc5e83c0eb
+Author: Daniel Stone <daniel@fooishbar.org>
+Date:   Tue Jul 10 00:34:56 2012 +0100
+
+    Fix compilation warnings for non-multitouch builds
+    
+    Signed-off-by: Daniel Stone <daniel@fooishbar.org>
+    Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    (cherry picked from commit f5ede98085688b59dc56a9cc6592f75552a4e7ed)
+
+commit 8af0e6f1ebaf327f735bca507134b34bb24b26c6
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri May 25 14:04:22 2012 +1000
+
+    strtol doesn't need a empty string, NULL is good enough.
+    
+    Fixes:
+    evdev.c: In function 'EvdevInitButtonMapping':
+    evdev.c:1659:25: warning: initialization discards 'const' qualifier from
+    pointer target type [enabled by default]
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
+    (cherry picked from commit 61faf2e6e70a4c9ecffe638d46829738dc2e3452)
+
+commit 56e9a7a248d70fd55ecc3588e72d0172d7c9ad27
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue Jul 24 14:05:09 2012 +1000
+
+    evdev 2.7.1
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 7df65237741b167b18ff0962a7bfc3db9d4826ed
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Mon May 28 09:50:15 2012 +1000
+
+    Close the fd when mtdev open fails
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
+    (cherry picked from commit 8251d7a8ec00b4160b6601a6f2f4f0f5d461cbee)
+
+commit f4e76a4c53f2abe0bd737485e0b32d6d36425118
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Mon May 28 09:08:43 2012 +1000
+
+    Release mtdev data whenever we close the fd
+    
+    Add a new EvdevCloseDevice() function to unify this.
+    We used to leak data
+    - PreInit allocates mtdev, but nothing except one error path released it.
+    - each DEVICE_ON re-allocates mtdev but it is never released
+    
+    Reported-by: Zdenek Kabelac <zdenek.kabelac@gmail.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
+    (cherry picked from commit ac5173163d7d1e18d47630a397ece0f26b2568c8)
+
+commit ac772cde9469c406564433d6d41416fa2279fbf9
+Author: Chase Douglas <chase.douglas@canonical.com>
+Date:   Wed Jun 6 12:07:12 2012 -0700
+
+    Fix buffer overrun when populating axis label property array
+    
+    The axis label property array currently only has enough elements for the
+    non-multitouch axes. This change allocates enough space for all axes,
+    which prevents an array overrun write. This may manifest as stack
+    corruption on some platforms.
+    
+    Signed-off-by: Chase Douglas <chase.douglas@canonical.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    (cherry picked from commit 4145fe1c087708bf5d6608e328342282ecb93ab0)
+
+commit 774915924102c348ce7045ffa07905d1079f447c
+Author: Chase Douglas <chase.douglas@canonical.com>
+Date:   Thu May 24 10:48:38 2012 -0700
+
+    Report the correct number of touches for MT protocol B devices
+    
+    Protocol B devices report the number of touches by giving a maximum and
+    minimum slot value. The current code ignores the minimum value, which is
+    usually 0, and underreports the number of touches by 1.
+    
+    Signed-off-by: Chase Douglas <chase.douglas@canonical.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    (cherry picked from commit 9ce068e760e1282183c7aa1b4cc6b0fcb6b494dd)
+
+commit 833fc517d75934797bdadbf043b18a1c94fc1293
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Apr 27 15:42:17 2012 +1000
+
+    Devices configured as mice need REL_X/Y
+    
+    Some keyboards export scroll axes and any absolute axis possible in 11
+    dimensions. All these axes are mute, except possibly for the scroll wheels.
+    
+    So if a device has a scroll axis, and we're configuring it as mouse, force
+    the x/y axes into existence. This stops the logspam complaining about not
+    enough axes on pointer movement after a xrandr change.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
+    (cherry picked from commit f28507e8ce2bd45b51c28f024baebd9711c28fc3)
+
+commit 4d698d8ece86a8e39b41c03b9b4c427b20b15449
 Author: Peter Hutterer <peter.hutterer@who-t.net>
 Date:   Thu Mar 15 15:46:32 2012 +1000
 
@@ -10,6 +174,7 @@ Date:   Thu Mar 15 15:46:32 2012 +1000
     
     Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
     Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
+    (cherry picked from commit 99340147b9092a5aaec997eca407282a51e1f063)
 
 commit 76b1d58a9791257fa8b4e6d3322fcb082c86b18a
 Author: Peter Hutterer <peter.hutterer@who-t.net>

@@ -1107,12 +1107,8 @@ EvdevReadInput(InputInfoPtr pInfo)
         if (len <= 0)
         {
             if (errno == ENODEV) /* May happen after resume */
-            {
-                EvdevMBEmuFinalize(pInfo);
-                Evdev3BEmuFinalize(pInfo);
                 xf86RemoveEnabledDevice(pInfo);
-                EvdevCloseDevice(pInfo);
-            } else if (errno != EAGAIN)
+            else if (errno != EAGAIN)
             {
                 /* We use X_NONE here because it doesn't alloc */
                 xf86MsgVerb(X_NONE, 0, "%s: Read error: %s\n", pInfo->name,
@@ -1669,7 +1665,7 @@ EvdevInitButtonMapping(InputInfoPtr pInfo)
 
         xf86IDrvMsg(pInfo, X_CONFIG, "ButtonMapping '%s'\n", mapping);
         map = mapping;
-        while (s && *s != '\0' && nbuttons < EVDEV_MAXBUTTONS)
+        do
         {
             btn = strtol(map, &s, 10);
 
@@ -1683,7 +1679,7 @@ EvdevInitButtonMapping(InputInfoPtr pInfo)
 
             pEvdev->btnmap[nbuttons++] = btn;
             map = s;
-        }
+        } while (s && *s != '\0' && nbuttons < EVDEV_MAXBUTTONS);
         free(mapping);
     }
 

@@ -1,8 +1,8 @@
-xserver-xorg-input-evdev (1:2.6.0-1ubuntu13.1) UNRELEASED; urgency=low
+xserver-xorg-input-evdev (1:2.6.0-1ubuntu13.1) oneiric-proposed; urgency=low
 
   * Update dependency for Open Input Framework rename (LP: #1046592)
 
- -- Chase Douglas <chase.douglas@ubuntu.com>  Wed, 05 Sep 2012 22:22:30 +0000
+ -- Chase Douglas <chase.douglas@ubuntu.com>  Wed, 05 Sep 2012 22:27:13 +0000
 
 xserver-xorg-input-evdev (1:2.6.0-1ubuntu13) oneiric; urgency=low
 

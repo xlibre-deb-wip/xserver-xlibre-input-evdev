@@ -4,8 +4,8 @@
  AC_ARG_WITH([sdkdir], [], [sdkdir="$withval"])
  AC_SUBST([sdkdir])
  
-+AC_ARG_ENABLE(utouch-grail, AS_HELP_STRING([--enable-utouch-grail], [Build with utouch-grail gesture support (default: auto)]), [GRAIL=$enableval], [GRAIL=auto])
-+PKG_CHECK_MODULES(GRAIL, utouch-grail, [have_grail=yes], [have_grail=no])
++AC_ARG_ENABLE(grail, AS_HELP_STRING([--enable-grail], [Build with grail gesture support (default: auto)]), [GRAIL=$enableval], [GRAIL=auto])
++PKG_CHECK_MODULES(GRAIL, grail, [have_grail=yes], [have_grail=no])
 +if test "x$GRAIL" = xauto; then
 +        GRAIL="$have_grail"
 +fi

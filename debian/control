@@ -18,7 +18,7 @@ Build-Depends:
  automake,
  libtool,
  xutils-dev (>= 1:7.5+4),
- libutouch-grail-dev (>= 1.0.10),
+ libgrail-dev,
  libmtdev-dev
 Standards-Version: 3.8.4
 Vcs-Git: git://git.debian.org/git/pkg-xorg/driver/xserver-xorg-input-evdev
@@ -27,7 +27,6 @@ Vcs-Browser: http://git.debian.org/?p=pkg-xorg/driver/xserver-xorg-input-evdev.g
 Package: xserver-xorg-input-evdev
 Architecture: linux-any
 Depends: ${shlibs:Depends}, ${misc:Depends}, ${xinpdriver:Depends},
- libutouch-grail1 (>= 1.0.19),
  xserver-xorg-core (>= 2:1.9.99.902-2ubuntu1)
 Provides: ${xinpdriver:Provides}
 Replaces: xserver-xorg (<< 6.8.2-35), xserver-xorg-input-gevdev
@@ -48,7 +47,6 @@ Section: debian-installer
 Architecture: linux-any
 Depends: ${shlibs:Depends}, ${misc:Depends}, ${xserver:Depends},
  udev-udeb [linux-any],
- libutouch-grail1-udeb (>= 1.0.19),
  xserver-xorg-core-udeb (>= 2:1.9.99.902-2ubuntu1)
 Provides: ${xinpdriver:Provides}
 Description: X.Org X server -- evdev input driver

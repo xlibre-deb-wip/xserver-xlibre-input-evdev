@@ -1,3 +1,10 @@
+xserver-xorg-input-evdev (1:2.7.3-0ubuntu2) quantal; urgency=low
+
+  * use-sigsafe-logging.diff: Pull a patch from upstream to use sigsafe
+    logging.
+
+ -- Timo Aaltonen <tjaalton@ubuntu.com>  Wed, 10 Oct 2012 11:16:55 +0300
+
 xserver-xorg-input-evdev (1:2.7.3-0ubuntu1) quantal-proposed; urgency=low
 
   [ Maarten Lankhorst ]

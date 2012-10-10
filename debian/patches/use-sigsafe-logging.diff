@@ -1,0 +1,73 @@
+commit 5af11b675242b2971f47c42a57b892dc24eb1917
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri May 25 13:39:32 2012 +1000
+
+    Use LogMessageVerbSigSafe if available
+    
+    Messages logged during the signal handler should use LogMessageVerbSigSafe
+    as of ABI 18.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
+
+--- a/src/evdev.c
++++ b/src/evdev.c
+@@ -339,7 +339,7 @@
+ 
+     if (pEvdev->num_queue >= EVDEV_MAXQUEUE)
+     {
+-        xf86IDrvMsg(pInfo, X_NONE, "dropping event due to full queue!\n");
++        LogMessageVerbSigSafe(X_WARNING, 0, "dropping event due to full queue!\n");
+         return NULL;
+     }
+ 
+@@ -788,9 +788,10 @@
+                     valuator_mask_copy(pEvdev->mt_mask,
+                                        pEvdev->last_mt_vals[slot_index]);
+                 else
+-                    xf86IDrvMsg(pInfo, X_WARNING,
+-                                "Attempted to copy values from out-of-range "
+-                                "slot, touch events may be incorrect.\n");
++                    LogMessageVerbSigSafe(X_WARNING, 0,
++                                "%s: Attempted to copy values from out-of-range "
++                                "slot, touch events may be incorrect.\n",
++                                pInfo->name);
+             } else
+                 pEvdev->slot_state = SLOTSTATE_CLOSE;
+         } else {
+@@ -1109,19 +1110,15 @@
+             if (errno == ENODEV) /* May happen after resume */
+                 xf86RemoveEnabledDevice(pInfo);
+             else if (errno != EAGAIN)
+-            {
+-                /* We use X_NONE here because it doesn't alloc */
+-                xf86MsgVerb(X_NONE, 0, "%s: Read error: %s\n", pInfo->name,
+-                        strerror(errno));
+-            }
++                LogMessageVerbSigSafe(X_ERROR, 0, "%s: Read error: %s\n", pInfo->name,
++                                       strerror(errno));
+             break;
+         }
+ 
+         /* The kernel promises that we always only read a complete
+          * event, so len != sizeof ev is an error. */
+         if (len % sizeof(ev[0])) {
+-            /* We use X_NONE here because it doesn't alloc */
+-            xf86MsgVerb(X_NONE, 0, "%s: Read error: %s\n", pInfo->name, strerror(errno));
++            LogMessageVerbSigSafe(X_ERROR, 0, "%s: Read error: %s\n", pInfo->name, strerror(errno));
+             break;
+         }
+ 
+--- a/src/evdev.h
++++ b/src/evdev.h
+@@ -67,6 +67,10 @@
+ #define HAVE_SMOOTH_SCROLLING 1
+ #endif
+ 
++#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) < 18
++#define LogMessageVerbSigSafe xf86MsgVerb
++#endif
++
+ #define EVDEV_MAXBUTTONS 32
+ #define EVDEV_MAXQUEUE 32
+ 

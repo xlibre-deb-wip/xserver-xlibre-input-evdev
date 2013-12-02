@@ -1,3 +1,24 @@
+xserver-xorg-input-evdev (1:2.8.2-1) unstable; urgency=low
+
+  [ Michele Cane ]
+  * New upstream release.
+
+ -- Julien Cristau <jcristau@debian.org>  Mon, 21 Oct 2013 21:07:27 +0200
+
+xserver-xorg-input-evdev (1:2.8.1-1) unstable; urgency=low
+
+  [ Maarten Lankhorst ]
+  * New upstream release.
+
+  [ Michele Cane ]
+  * New upstream release.
+  * Bump Standards-Version to 3.9.4, no changes needed.
+
+  [ Julien Cristau ]
+  * Disable silent build rules.
+
+ -- Julien Cristau <jcristau@debian.org>  Thu, 05 Sep 2013 20:03:34 +0200
+
 xserver-xorg-input-evdev (1:2.7.3-0ubuntu2) quantal; urgency=low
 
   * use-sigsafe-logging.diff: Pull a patch from upstream to use sigsafe
@@ -14,12 +35,6 @@ xserver-xorg-input-evdev (1:2.7.3-0ubuntu1) quantal-proposed; urgency=low
     - local/11-evdev-quirks.conf: Added quirks for various devices.
 
  -- Timo Aaltonen <tjaalton@ubuntu.com>  Wed, 15 Aug 2012 11:47:13 +0300
-
-xserver-xorg-input-evdev (1:2.7.3-1) UNRELEASED; urgency=low
-
-  * New upstream release.
-
- -- Maarten Lankhorst <maarten.lankhorst@canonical.com>  Fri, 10 Aug 2012 19:08:53 +0200
 
 xserver-xorg-input-evdev (1:2.7.1-1) experimental; urgency=low
 

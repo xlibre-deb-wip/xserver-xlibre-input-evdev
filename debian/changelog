@@ -1,3 +1,9 @@
+xserver-xorg-input-evdev (1:2.8.2-1ubuntu2) trusty; urgency=medium
+
+  * Rebuild for xorg 1.15 abi.
+
+ -- Maarten Lankhorst <maarten.lankhorst@ubuntu.com>  Wed, 05 Feb 2014 09:36:37 +0000
+
 xserver-xorg-input-evdev (1:2.8.2-1ubuntu1) trusty; urgency=low
 
   * Merge from unreleased debian git, remaining changes:

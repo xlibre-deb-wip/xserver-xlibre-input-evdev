@@ -1,3 +1,15 @@
+xserver-xorg-input-evdev (1:2.9.2-1ubuntu1) wily; urgency=medium
+
+  * Merge with Debian, remaining Ubuntu changes:
+  * local/11-evdev-trackpoint.conf:
+    - Add a config snippet for enabling wheel emulation for trackpoint devices
+  * local/11-evdev-quirks.conf:
+    - Added quirks for various devices.
+  * debian/xserver-xorg-input-evdev.install:
+    - Install quirks
+
+ -- Robert Ancell <robert.ancell@canonical.com>  Wed, 15 Jul 2015 10:43:55 +1200
+
 xserver-xorg-input-evdev (1:2.9.2-1) unstable; urgency=medium
 
   * New upstream release.

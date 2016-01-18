@@ -1,3 +1,134 @@
+commit 24368d8379cc47693dd1623168a6125faff57311
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Mar 27 11:37:03 2015 +1000
+
+    evdev 2.9.2
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 4996694cc9b80ffef28289ea491965b16615f2d1
+Author: Tobias Himmer <provisorisch@online.de>
+Date:   Fri Jan 23 02:13:17 2015 +0100
+
+    Check for incoming MT slot indices exceeding the allocated number of slots.
+    
+    Fixes: https://bugs.freedesktop.org/show_bug.cgi?id=88715
+    
+    Signed-off-by: Tobias Himmer <provisorisch@online.de>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    (cherry picked from commit abc4a8b60387c3c9ae8b0199bf61acede4f6dba2)
+
+commit 05f7057ad5716ccf643b80f2f5fbfff34783a950
+Author: Colin B. Macdonald <macdonald@maths.ox.ac.uk>
+Date:   Thu Jun 26 12:17:59 2014 +0100
+
+    Workaround lack of ABS_X on MT devices (#80470)
+    
+    Often on Android, we have ABS_MT_POSITION_X without ABS_X (which is contrary
+    to spec). We add fake ABS_X axis in that case.
+    
+    X.Org Bug 80470 <http://bugs.freedesktop.org/show_bug.cgi?id=80470>
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    (cherry picked from commit b370ccdff8f721de75d3d91486cc4807668d040c)
+
+commit cb3b023783fe73d9bbb7c9c6ba6c73048b8303ef
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed Nov 26 09:23:39 2014 +1000
+
+    evdev 2.9.1
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 124eff9ba20c5ae777a6a5aa36f32112ad31b931
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Nov 7 13:41:06 2014 +1000
+
+    Remove three unused #defines
+    
+    Obsolete since 768c25a99b2f4ec07993eb15a0f05a5e22b5c695
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 605047613c534babf723f25597e8cc4be6758db0
+Author: Éric Brunet <Eric.Brunet@lps.ens.fr>
+Date:   Sat Sep 27 22:06:36 2014 +0200
+
+    Don't pass superfluous arguments to EvdevPost*Events
+    
+    The functions EvdevPostProximityEvents, EvdevPostRelativeMotionEvents,
+    EvdevPostAbsoluteMotionEvents and EvdevPostQueuedEvents are only called
+    by EvdevProcessSyncEvent. These functions take as arguments an array of
+    valuators which is set by EvdevProcessSyncEvent to contain ... nothing.
+    This patch changes the prototype of the four functions, their definitions
+    and the way they are called  to remove the useless array of valuators.
+    
+    Signed-off-by: Éric Brunet <Eric.Brunet@lps.ens.fr>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 3ee98d0b7f7c266b8c7954b7710f9724a9c9cddd
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Aug 29 13:14:56 2014 +1000
+
+    Drop some unused #defines
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 977588d24a6bc511454c7bd616e8b24a8bc3f58e
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu Aug 14 11:56:03 2014 +1000
+
+    If only IgnoreRelativeAxes is set, init like a normal relative device
+    
+    In the current code, if only IgnoreRelativeAxes is set, the code would go on
+    and force absolute axes to initialize even if the relative axes were
+    successfully initialized.
+    
+    Evdev gives precedence to relative axes anyway, initializing absolute axes if
+    the relative axes failed. Thus, if we explicitely want relative axes but leave
+    the abs axes as-is, proceed as normal.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 291b60172d25446d2cabe61ed93e56db6570baa3
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu Aug 14 10:48:52 2014 +1000
+
+    Fix axis initialization for devices with abs x/y and rel scrollwheels
+    
+    The Xen Virtual Pointer device has ABS_X, ABS_Y and REL_WHEEL. If smooth
+    scrolling is detected, the current code would first initialize relative axes
+    for scrolling and immediately overwrite those axes when the abs valuators are
+    written out.
+    
+    This patch fixes the default case only, in the case of a device setting the
+    two Ignore*Axis options both to "off", the axes are still overwritten. The
+    wheels will work, other axes only if the same number of abs axes exists. And
+    it keeps the current memory leak too, but it's marked with a FIXME now.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 8ce06c96e469139bb12065d80fe4abb6173e2855
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue Aug 5 15:59:17 2014 +1000
+
+    Make the slot-state per slot
+    
+    The previous approach only had the slot state for the current slot. If we
+    changed slots, that means we lost the information if the slot was ever
+    initialized. If the ABS_MT_TRACKING_ID was never received, the slot would
+    still update and try to send events (which the server refused with a warning).
+    
+    Avoid this by having a per-slot state and a dirty bit that tells us if the
+    current slot updated at all. If we don't get the tracking ID, leave the slot
+    empty and refuse any further events from that touch.
+    
+    This quashes the various "unable to find touch point 0" warnings caused if a
+    touchpoint starts before the device is enabled.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Walter Harms <wharms@bfs.de>
+
 commit 5d239ceb260cd554245e8f0dc3627990726ea9b9
 Author: Peter Hutterer <peter.hutterer@who-t.net>
 Date:   Thu May 15 08:41:06 2014 +1000

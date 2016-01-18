@@ -1,3 +1,27 @@
+xserver-xorg-input-evdev (1:2.9.2-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Let uscan verify tarball signatures.
+
+ -- Julien Cristau <jcristau@debian.org>  Sat, 02 May 2015 20:14:42 +0200
+
+xserver-xorg-input-evdev (1:2.9.0-2) unstable; urgency=medium
+
+  * Team upload.
+  [ Cyril Brulebois ]
+  * Bump libevdev-dev build-dep to make sure the udeb gets a dependency
+    on libevdev2-udeb instead of libevdev2 (see: #750698).
+
+  [ Laurent Bigonville ]
+  * Upload to unstable
+  * debian/control:
+    - Use canonical URL for VCS-* fields
+    - Bump Standards-Version to 3.9.5 (no further changes)
+    - Fix short description of xserver-xorg-input-evdev-dbg package
+  * debian/rules: Pass the hardening flags to dh_auto_configure
+
+ -- Laurent Bigonville <bigon@debian.org>  Thu, 28 Aug 2014 13:54:00 +0200
+
 xserver-xorg-input-evdev (1:2.9.0-1ubuntu2) utopic; urgency=low
 
   * Rebuild for xorg 1.16.

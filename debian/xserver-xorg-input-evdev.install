@@ -1,4 +1,5 @@
 usr/lib/xorg/modules/input/*.so
 usr/share/man
+usr/share/X11/xorg.conf.d/10-evdev.conf
 ../local/11-evdev-quirks.conf	usr/share/X11/xorg.conf.d/
 ../local/11-evdev-trackpoint.conf	usr/share/X11/xorg.conf.d/

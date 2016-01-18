@@ -1,3 +1,11 @@
+xserver-xorg-input-evdev (1:2.10.1-1) UNRELEASED; urgency=medium
+
+  * New upstream release.
+  * control, install: Ship 10-evdev.conf with the driver,
+    breaks/replaces server << 1.18.0-1.
+
+ -- Timo Aaltonen <tjaalton@debian.org>  Mon, 18 Jan 2016 14:40:32 +0200
+
 xserver-xorg-input-evdev (1:2.9.2-1ubuntu1) wily; urgency=medium
 
   * Merge with Debian, remaining Ubuntu changes:

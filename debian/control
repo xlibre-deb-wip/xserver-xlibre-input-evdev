@@ -31,8 +31,8 @@ Depends:
  ${xinpdriver:Depends},
 Provides:
  ${xinpdriver:Provides}
-Breaks: xserver-xorg-core (<< 1.18.0-1)
-Replaces: xserver-xorg-core (<< 1.18.0-1)
+Breaks: xserver-xorg-core (<< 2:1.18.0-1)
+Replaces: xserver-xorg-core (<< 2:1.18.0-1)
 Description: X.Org X server -- evdev input driver
  This package provides the driver for input devices using evdev, the Linux
  kernel's event delivery mechanism.  This driver allows for multiple keyboards

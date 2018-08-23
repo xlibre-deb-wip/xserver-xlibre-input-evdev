@@ -1,6 +1,7 @@
 xserver-xorg-input-evdev (1:2.10.6-1) UNRELEASED; urgency=medium
 
   * New upstream release.
+  * control: Update vcs urls.
 
  -- Timo Aaltonen <tjaalton@debian.org>  Thu, 23 Aug 2018 16:36:38 +0300
 

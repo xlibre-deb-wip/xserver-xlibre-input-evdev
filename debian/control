@@ -19,8 +19,8 @@ Build-Depends:
  libevdev-dev (>= 1.2.2+dfsg-1~),
 Standards-Version: 3.9.8
 Homepage: https://www.x.org
-Vcs-Git: https://anonscm.debian.org/git/pkg-xorg/driver/xserver-xorg-input-evdev.git
-Vcs-Browser: https://anonscm.debian.org/git/pkg-xorg/driver/xserver-xorg-input-evdev.git
+Vcs-Git: https://salsa.debian.org/xorg-team/driver/xserver-xorg-input-evdev.git
+Vcs-Browser: https://salsa.debian.org/xorg-team/driver/xserver-xorg-input-evdev
 
 Package: xserver-xorg-input-evdev
 Architecture: linux-any

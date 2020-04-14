@@ -13,7 +13,7 @@ Build-Depends:
  libudev-dev,
  libmtdev-dev,
  libevdev-dev (>= 1.2.2+dfsg-1~),
-Standards-Version: 4.2.0
+Standards-Version: 4.5.0
 Homepage: https://www.x.org
 Vcs-Git: https://salsa.debian.org/xorg-team/driver/xserver-xorg-input-evdev.git
 Vcs-Browser: https://salsa.debian.org/xorg-team/driver/xserver-xorg-input-evdev

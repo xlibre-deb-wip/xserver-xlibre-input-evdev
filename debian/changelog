@@ -1,3 +1,9 @@
+xserver-xorg-input-evdev (1:2.10.6-3) UNRELEASED; urgency=medium
+
+  * Trim trailing whitespace.
+
+ -- Debian Janitor <janitor@jelmer.uk>  Wed, 14 Sep 2022 03:42:34 -0000
+
 xserver-xorg-input-evdev (1:2.10.6-2) unstable; urgency=medium
 
   * Migrate to dbgsym package.
@@ -579,7 +585,7 @@ xserver-xorg-input-evdev (1:1.1.2-2) unstable; urgency=low
 
   [ Drew Parsons ]
   * Upstream patch 1-add-inotify-architectures.patch enables building
-    for hppa, mips (from git upstream) and m68k (thanks Geert Uytterhoeven). 
+    for hppa, mips (from git upstream) and m68k (thanks Geert Uytterhoeven).
     Closes: #387922, #388639.
   * Install upstream ChangeLog. Closes: #370300.
   * Exclude evdev_drv.la from dh_install.

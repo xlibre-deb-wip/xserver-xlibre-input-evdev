@@ -4,6 +4,7 @@ xserver-xorg-input-evdev (1:2.10.6-3) UNRELEASED; urgency=medium
   * Bump debhelper from old 12 to 13.
     + debian/rules: Drop --fail-missing argument to dh_missing, which is now the
       default.
+  * Update standards version to 4.6.1, no changes needed.
 
  -- Debian Janitor <janitor@jelmer.uk>  Wed, 14 Sep 2022 03:42:34 -0000
 

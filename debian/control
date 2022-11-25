@@ -55,6 +55,7 @@ Architecture: all
 Depends:
  ${shlibs:Depends},
  ${misc:Depends}
+Multi-Arch: foreign
 Description: X.Org X server -- evdev input driver (development headers)
  This package provides the development headers for the evdev input driver
  found in xserver-xorg-input-evdev. Non-developers likely have little use

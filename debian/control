@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: Debian X Strike Force <debian-x@lists.debian.org>
 Build-Depends:
  debhelper-compat (= 13),
- pkg-config,
+ pkgconf,
  quilt,
  xserver-xorg-dev (>= 2:1.15.99),
  x11proto-dev,

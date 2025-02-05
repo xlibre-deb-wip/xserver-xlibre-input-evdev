@@ -38,9 +38,10 @@
 #include <X11/keysym.h>
 #include <X11/extensions/XI.h>
 
-#include <linux/version.h>
 #include <sys/stat.h>
+#ifdef HAVE_LIBUDEV
 #include <libudev.h>
+#endif
 #include <unistd.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -74,8 +75,8 @@
 #define CAPSFLAG	1
 #define NUMFLAG		2
 #define SCROLLFLAG	4
-#define MODEFLAG	8
-#define COMPOSEFLAG	16
+#define COMPOSEFLAG	8
+#define MODEFLAG	16
 
 #ifndef ABS_MT_SLOT
 #define ABS_MT_SLOT 0x2f
@@ -226,6 +227,7 @@ EvdevIsDuplicate(InputInfoPtr pInfo)
 static BOOL
 EvdevDeviceIsVirtual(const char* devicenode)
 {
+#ifdef HAVE_LIBUDEV
     struct udev *udev = NULL;
     struct udev_device *device = NULL;
     struct stat st;
@@ -256,6 +258,9 @@ out:
     udev_device_unref(device);
     udev_unref(udev);
     return rc;
+#else
+    return FALSE;
+#endif
 }
 
 
@@ -277,7 +282,7 @@ EvdevNextInQueue(InputInfoPtr pInfo)
 void
 EvdevQueueKbdEvent(InputInfoPtr pInfo, struct input_event *ev, int value)
 {
-    int code = ev->code + MIN_KEYCODE;
+    int code = ev->code;
     EventQueuePtr pQueue;
 
     /* Filter all repeated events from device.
@@ -285,10 +290,18 @@ EvdevQueueKbdEvent(InputInfoPtr pInfo, struct input_event *ev, int value)
     if (value == 2)
         return;
 
+    /* keycodes > 256 that have a historical mapping in xkeyboard-config */
+    switch (code) {
+        case KEY_TOUCHPAD_TOGGLE: code = KEY_F21; break;
+        case KEY_TOUCHPAD_ON:     code = KEY_F22; break;
+        case KEY_TOUCHPAD_OFF:    code = KEY_F23; break;
+        case KEY_MICMUTE:         code = KEY_F20; break;
+    }
+
     if ((pQueue = EvdevNextInQueue(pInfo)))
     {
         pQueue->type = EV_QUEUE_KEY;
-        pQueue->detail.key = code;
+        pQueue->detail.key = code + MIN_KEYCODE;
         pQueue->val = value;
     }
 }
@@ -1072,11 +1085,13 @@ EvdevReadInput(InputInfoPtr pInfo)
     do {
         rc = libevdev_next_event(pEvdev->dev, LIBEVDEV_READ_FLAG_NORMAL, &ev);
         if (rc < 0) {
-            if (rc == -ENODEV) /* May happen after resume */
+            if (rc != -EAGAIN && rc != -EINTR && rc != -EWOULDBLOCK) {
+                /* May happen after resume or at device detach */
                 xf86RemoveEnabledDevice(pInfo);
-            else if (rc != -EAGAIN)
+                EvdevCloseDevice(pInfo);
                 LogMessageVerbSigSafe(X_ERROR, 0, "%s: Read error: %s\n", pInfo->name,
                                        strerror(-rc));
+            }
             break;
         } else if (rc == LIBEVDEV_READ_STATUS_SUCCESS) {
             if (pEvdev->mtdev)
@@ -1110,8 +1125,8 @@ EvdevKbdCtrl(DeviceIntPtr device, KeybdCtrl *ctrl)
         { CAPSFLAG,	LED_CAPSL },
         { NUMFLAG,	LED_NUML },
         { SCROLLFLAG,	LED_SCROLLL },
-        { MODEFLAG,	LED_KANA },
-        { COMPOSEFLAG,	LED_COMPOSE }
+        { COMPOSEFLAG,	LED_COMPOSE },
+        { MODEFLAG,	LED_KANA }
     };
 
     InputInfoPtr pInfo;
@@ -1486,10 +1501,8 @@ EvdevAddAbsValuatorClass(DeviceIntPtr device, int num_scroll_axes)
             continue;
 
         abs = libevdev_get_abs_info(pEvdev->dev, axis);
-#if LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 30)
         /* Kernel provides units/mm, X wants units/m */
         resolution = abs->resolution * 1000;
-#endif
 
         xf86InitValuatorAxisStruct(device, axnum,
                                    atoms[axnum],
@@ -1933,7 +1946,7 @@ EvdevInit(DeviceIntPtr device)
      * So, unless you have a small screen, you won't be enjoying it much;
      * consequently, absolute axes are generally ignored.
      *
-     * However, currenly only a device with absolute axes can be registered
+     * However, currently only a device with absolute axes can be registered
      * as a touch{pad,screen}. Thus, given such a device, absolute axes are
      * used and relative axes are ignored.
      */

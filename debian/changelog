@@ -1,4 +1,4 @@
-xserver-xorg-input-evdev (1:2.11.0-1) UNRELEASED; urgency=medium
+xserver-xorg-input-evdev (1:2.11.0-1) unstable; urgency=medium
 
   [ Debian Janitor ]
   * Trim trailing whitespace.
@@ -11,7 +11,7 @@ xserver-xorg-input-evdev (1:2.11.0-1) UNRELEASED; urgency=medium
   * New upstream release.
   * control: Migrate to pkgconf.
 
- -- Debian Janitor <janitor@jelmer.uk>  Wed, 14 Sep 2022 03:42:34 -0000
+ -- Timo Aaltonen <tjaalton@debian.org>  Wed, 05 Feb 2025 13:49:31 +0200
 
 xserver-xorg-input-evdev (1:2.10.6-2) unstable; urgency=medium
 

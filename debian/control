@@ -29,12 +29,12 @@ Provides:
  ${xinpdriver:Provides}
 Breaks: xserver-xorg-core (<< 2:1.18.0-1)
 Replaces: xserver-xorg-core (<< 2:1.18.0-1)
-Description: X.Org X server -- evdev input driver
+Description: XLibre X server -- evdev input driver
  This package provides the driver for input devices using evdev, the Linux
  kernel's event delivery mechanism.  This driver allows for multiple keyboards
  and mice to be treated as separate input devices.
  .
- This package is built from the X.org xf86-input-evdev driver module.
+ This package is built from the XLibre xf86-input-evdev driver module.
 Conflicts:
  xserver-xorg-input-evdev,
 
@@ -50,7 +50,7 @@ Depends:
 Provides:
  xserver-xorg-input-evdev-udeb,
  ${xinpdriver:Provides}
-Description: X.Org X server -- evdev input driver
+Description: XLibre X server -- evdev input driver
  This is a udeb, or a microdeb, for the debian-installer.
 Conflicts:
  xserver-xorg-input-evdev-udeb,
@@ -62,12 +62,12 @@ Depends:
  ${shlibs:Depends},
  ${misc:Depends}
 Multi-Arch: foreign
-Description: X.Org X server -- evdev input driver (development headers)
+Description: XLibre X server -- evdev input driver (development headers)
  This package provides the development headers for the evdev input driver
- found in xserver-xorg-input-evdev. Non-developers likely have little use
+ found in xserver-xlibre-input-evdev. Non-developers likely have little use
  for this package.
  .
- This package is built from the X.org xf86-input-evdev driver module.
+ This package is built from the XLibre xf86-input-evdev driver module.
 Provides:
  xserver-xorg-input-evdev-dev,
 Conflicts:

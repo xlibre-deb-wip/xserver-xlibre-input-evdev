@@ -1,4 +1,2 @@
-#git=https://gitlab.freedesktop.org/xorg/driver/xf86-input-evdev
-version=3
-opts=pgpsigurlmangle=s/$/.sig/ \
-https://xorg.freedesktop.org/releases/individual/driver/ xf86-input-evdev-(.*)\.tar\.gz
+version=4
+https://github.com/X11Libre/xf86-input-evdev/tags .*/xlibre-xf86-input-evdev-(.*)@ARCHIVE_EXT@

@@ -1,4 +1,4 @@
-xserver-xlibre-input-evdev (2.11.0.1) unstable; urgency=low
+xserver-xlibre-input-evdev (1:2.11.0.1-1) unstable; urgency=low
 
   * Initial release.
 

@@ -22,4 +22,4 @@ override_dh_shlibdeps:
 
 # Debug package:
 override_dh_strip:
-	dh_strip -pxserver-xorg-input-evdev --dbgsym-migration="xserver-xorg-input-evdev-dbg (<< 1:2.10.6-2~)"
+	dh_strip -pxserver-xlibre-input-evdev

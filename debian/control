@@ -25,7 +25,7 @@ Depends:
  ${misc:Depends},
  ${xinpdriver:Depends},
 Provides:
- xserver-xorg-input-evdev,
+ xserver-xorg-input-evdev (= ${binary:Version}),
  ${xinpdriver:Provides}
 Breaks: xserver-xorg-core (<< 2:1.18.0-1)
 Replaces: xserver-xorg-core (<< 2:1.18.0-1)
@@ -48,7 +48,7 @@ Depends:
  ${xinpdriver:Depends},
  udev-udeb,
 Provides:
- xserver-xorg-input-evdev-udeb,
+ xserver-xorg-input-evdev-udeb (= ${binary:Version}),
  ${xinpdriver:Provides}
 Description: XLibre X server -- evdev input driver
  This is a udeb, or a microdeb, for the debian-installer.
@@ -69,6 +69,6 @@ Description: XLibre X server -- evdev input driver (development headers)
  .
  This package is built from the XLibre xf86-input-evdev driver module.
 Provides:
- xserver-xorg-input-evdev-dev,
+ xserver-xorg-input-evdev-dev (= ${binary:Version}),
 Conflicts:
  xserver-xorg-input-evdev-dev,
